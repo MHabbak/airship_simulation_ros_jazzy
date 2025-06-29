@@ -1,7 +1,0 @@
-Metadata-Version: 2.1
-Name: fake-gps-drift
-Version: 0.0.0
-Summary: Simulate GPS drift in ROS 2
-Maintainer: Eric Price
-Maintainer-email: eric.price@tuebingen.mpg.de
-License: Apache-2.0

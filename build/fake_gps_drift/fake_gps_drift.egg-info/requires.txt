@@ -1,4 +1,0 @@
-geometry_msgs
-message_filters
-rclpy
-setuptools

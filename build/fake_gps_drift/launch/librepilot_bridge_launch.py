@@ -1,1 +1,0 @@
-/home/boko/airship_simulation_ros_jazzy/src/fake_gps_drift/launch/librepilot_bridge_launch.py

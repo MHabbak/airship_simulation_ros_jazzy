@@ -1,1 +1,0 @@
-/home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift/launch/default.launch.py
