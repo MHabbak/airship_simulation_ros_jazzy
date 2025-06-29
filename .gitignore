@@ -1,0 +1,16 @@
+# ROS2 colcon build artifacts
+build/
+install/
+log/
+
+# Ignore marker files or caches
+**/COLCON_IGNORE
+**/AMENT_IGNORE
+
+# Python caches (optional)
+*.pyc
+__pycache__/
+
+# Other temp or auto-gen files (optional)
+*.egg-info/
+.venv/
