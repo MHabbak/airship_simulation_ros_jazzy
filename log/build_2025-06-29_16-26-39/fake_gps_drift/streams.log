@@ -1,0 +1,26 @@
+[0.541s] Invoking command in '/home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/boko/airship_simulation_ros_jazzy/install/fake_gps_drift/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift/build --no-deps symlink_data
+[0.765s] running develop
+[0.910s] running egg_info
+[0.926s] writing fake_gps_drift.egg-info/PKG-INFO
+[0.926s] writing dependency_links to fake_gps_drift.egg-info/dependency_links.txt
+[0.926s] writing entry points to fake_gps_drift.egg-info/entry_points.txt
+[0.926s] writing requirements to fake_gps_drift.egg-info/requires.txt
+[0.926s] writing top-level names to fake_gps_drift.egg-info/top_level.txt
+[0.958s] reading manifest file 'fake_gps_drift.egg-info/SOURCES.txt'
+[0.958s] writing manifest file 'fake_gps_drift.egg-info/SOURCES.txt'
+[0.976s] running build_ext
+[0.976s] Creating /home/boko/airship_simulation_ros_jazzy/install/fake_gps_drift/lib/python3.12/site-packages/fake-gps-drift.egg-link (link to .)
+[0.977s] Installing fake_gps_drift_node script to /home/boko/airship_simulation_ros_jazzy/install/fake_gps_drift/bin
+[0.977s] 
+[0.977s] Installed /home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift
+[0.977s] running symlink_data
+[0.977s] creating /home/boko/airship_simulation_ros_jazzy/install/fake_gps_drift/share
+[0.977s] creating /home/boko/airship_simulation_ros_jazzy/install/fake_gps_drift/share/ament_index
+[0.977s] creating /home/boko/airship_simulation_ros_jazzy/install/fake_gps_drift/share/ament_index/resource_index
+[0.977s] creating /home/boko/airship_simulation_ros_jazzy/install/fake_gps_drift/share/ament_index/resource_index/packages
+[0.977s] symbolically linking /home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift/resource/fake_gps_drift -> /home/boko/airship_simulation_ros_jazzy/install/fake_gps_drift/share/ament_index/resource_index/packages
+[0.977s] creating /home/boko/airship_simulation_ros_jazzy/install/fake_gps_drift/share/fake_gps_drift
+[0.977s] symbolically linking /home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift/package.xml -> /home/boko/airship_simulation_ros_jazzy/install/fake_gps_drift/share/fake_gps_drift
+[0.977s] creating /home/boko/airship_simulation_ros_jazzy/install/fake_gps_drift/share/fake_gps_drift/launch
+[0.977s] symbolically linking /home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift/launch/default.launch.py -> /home/boko/airship_simulation_ros_jazzy/install/fake_gps_drift/share/fake_gps_drift/launch
+[1.002s] Invoked command in '/home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/boko/airship_simulation_ros_jazzy/install/fake_gps_drift/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift/build --no-deps symlink_data

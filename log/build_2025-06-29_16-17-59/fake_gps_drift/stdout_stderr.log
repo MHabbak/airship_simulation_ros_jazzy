@@ -1,0 +1,10 @@
+running develop
+running egg_info
+creating fake_gps_drift.egg-info
+writing fake_gps_drift.egg-info/PKG-INFO
+writing dependency_links to fake_gps_drift.egg-info/dependency_links.txt
+writing entry points to fake_gps_drift.egg-info/entry_points.txt
+writing requirements to fake_gps_drift.egg-info/requires.txt
+writing top-level names to fake_gps_drift.egg-info/top_level.txt
+writing manifest file 'fake_gps_drift.egg-info/SOURCES.txt'
+error: package directory 'fake_gps_drift' does not exist

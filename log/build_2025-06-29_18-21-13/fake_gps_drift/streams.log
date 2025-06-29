@@ -1,0 +1,17 @@
+[0.614s] Invoking command in '/home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/boko/airship_simulation_ros_jazzy/install/fake_gps_drift/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift/build --no-deps symlink_data
+[0.825s] running develop
+[0.962s] running egg_info
+[0.975s] writing fake_gps_drift.egg-info/PKG-INFO
+[0.975s] writing dependency_links to fake_gps_drift.egg-info/dependency_links.txt
+[0.975s] writing entry points to fake_gps_drift.egg-info/entry_points.txt
+[0.975s] writing requirements to fake_gps_drift.egg-info/requires.txt
+[0.975s] writing top-level names to fake_gps_drift.egg-info/top_level.txt
+[1.001s] reading manifest file 'fake_gps_drift.egg-info/SOURCES.txt'
+[1.002s] writing manifest file 'fake_gps_drift.egg-info/SOURCES.txt'
+[1.015s] running build_ext
+[1.016s] Creating /home/boko/airship_simulation_ros_jazzy/install/fake_gps_drift/lib/python3.12/site-packages/fake-gps-drift.egg-link (link to .)
+[1.016s] Installing fake_gps_drift_node script to /home/boko/airship_simulation_ros_jazzy/install/fake_gps_drift/lib/fake_gps_drift
+[1.016s] 
+[1.016s] Installed /home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift
+[1.016s] running symlink_data
+[1.037s] Invoked command in '/home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/boko/airship_simulation_ros_jazzy/install/fake_gps_drift/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --editable --build-directory /home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift/build --no-deps symlink_data

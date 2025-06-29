@@ -1,0 +1,2 @@
+[console_scripts]
+fake_gps_drift_node = fake_gps_drift.fake_gps_drift_node:main

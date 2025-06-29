@@ -1,0 +1,15 @@
+source;share/fake_gps_drift/hook/path.ps1
+source;share/fake_gps_drift/hook/path.dsv
+source;share/fake_gps_drift/hook/path.sh
+source;share/fake_gps_drift/hook/pythonpath.ps1
+source;share/fake_gps_drift/hook/pythonpath.dsv
+source;share/fake_gps_drift/hook/pythonpath.sh
+source;share/fake_gps_drift/hook/pythonscriptspath.ps1
+source;share/fake_gps_drift/hook/pythonscriptspath.dsv
+source;share/fake_gps_drift/hook/pythonscriptspath.sh
+source;share/fake_gps_drift/hook/ament_prefix_path.ps1
+source;share/fake_gps_drift/hook/ament_prefix_path.dsv
+source;share/fake_gps_drift/hook/ament_prefix_path.sh
+source;../../build/fake_gps_drift/share/fake_gps_drift/hook/pythonpath_develop.ps1
+source;../../build/fake_gps_drift/share/fake_gps_drift/hook/pythonpath_develop.dsv
+source;../../build/fake_gps_drift/share/fake_gps_drift/hook/pythonpath_develop.sh

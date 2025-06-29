@@ -1,0 +1,38 @@
+[0.544s] Invoking command in '/home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/boko/airship_simulation_ros_jazzy/install/fake_gps_drift/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --uninstall --editable --build-directory /home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift/build
+[0.747s] running develop
+[0.888s] Removing /home/boko/airship_simulation_ros_jazzy/install/fake_gps_drift/lib/python3.12/site-packages/fake-gps-drift.egg-link (link to .)
+[0.906s] Invoked command in '/home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/boko/airship_simulation_ros_jazzy/install/fake_gps_drift/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py develop --uninstall --editable --build-directory /home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift/build
+[0.907s] Invoking command in '/home/boko/airship_simulation_ros_jazzy/src/fake_gps_drift': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/boko/airship_simulation_ros_jazzy/install/fake_gps_drift/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/fake_gps_drift build --build-base /home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift/build install --record /home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift/install.log --single-version-externally-managed install_data --force
+[1.089s] running egg_info
+[1.102s] writing ../../build/fake_gps_drift/fake_gps_drift.egg-info/PKG-INFO
+[1.102s] writing dependency_links to ../../build/fake_gps_drift/fake_gps_drift.egg-info/dependency_links.txt
+[1.102s] writing entry points to ../../build/fake_gps_drift/fake_gps_drift.egg-info/entry_points.txt
+[1.102s] writing requirements to ../../build/fake_gps_drift/fake_gps_drift.egg-info/requires.txt
+[1.102s] writing top-level names to ../../build/fake_gps_drift/fake_gps_drift.egg-info/top_level.txt
+[1.128s] reading manifest file '../../build/fake_gps_drift/fake_gps_drift.egg-info/SOURCES.txt'
+[1.128s] adding license file 'LICENSE'
+[1.129s] writing manifest file '../../build/fake_gps_drift/fake_gps_drift.egg-info/SOURCES.txt'
+[1.129s] running build
+[1.129s] running build_py
+[1.129s] creating /home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift/build
+[1.129s] creating /home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift/build/lib
+[1.129s] creating /home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift/build/lib/fake_gps_drift
+[1.129s] copying fake_gps_drift/fake_gps_drift_node.py -> /home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift/build/lib/fake_gps_drift
+[1.129s] copying fake_gps_drift/__init__.py -> /home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift/build/lib/fake_gps_drift
+[1.129s] running install
+[1.134s] running install_lib
+[1.149s] creating /home/boko/airship_simulation_ros_jazzy/install/fake_gps_drift/lib/python3.12/site-packages/fake_gps_drift
+[1.149s] copying /home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift/build/lib/fake_gps_drift/fake_gps_drift_node.py -> /home/boko/airship_simulation_ros_jazzy/install/fake_gps_drift/lib/python3.12/site-packages/fake_gps_drift
+[1.149s] copying /home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift/build/lib/fake_gps_drift/__init__.py -> /home/boko/airship_simulation_ros_jazzy/install/fake_gps_drift/lib/python3.12/site-packages/fake_gps_drift
+[1.150s] byte-compiling /home/boko/airship_simulation_ros_jazzy/install/fake_gps_drift/lib/python3.12/site-packages/fake_gps_drift/fake_gps_drift_node.py to fake_gps_drift_node.cpython-312.pyc
+[1.151s] byte-compiling /home/boko/airship_simulation_ros_jazzy/install/fake_gps_drift/lib/python3.12/site-packages/fake_gps_drift/__init__.py to __init__.cpython-312.pyc
+[1.151s] running install_data
+[1.151s] copying resource/fake_gps_drift -> /home/boko/airship_simulation_ros_jazzy/install/fake_gps_drift/share/ament_index/resource_index/packages
+[1.151s] copying package.xml -> /home/boko/airship_simulation_ros_jazzy/install/fake_gps_drift/share/fake_gps_drift
+[1.151s] copying launch/default.launch.py -> /home/boko/airship_simulation_ros_jazzy/install/fake_gps_drift/share/fake_gps_drift/launch
+[1.151s] running install_egg_info
+[1.166s] Copying ../../build/fake_gps_drift/fake_gps_drift.egg-info to /home/boko/airship_simulation_ros_jazzy/install/fake_gps_drift/lib/python3.12/site-packages/fake_gps_drift-0.0.0-py3.12.egg-info
+[1.167s] running install_scripts
+[1.261s] Installing fake_gps_drift_node script to /home/boko/airship_simulation_ros_jazzy/install/fake_gps_drift/bin
+[1.261s] writing list of installed files to '/home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift/install.log'
+[1.280s] Invoked command in '/home/boko/airship_simulation_ros_jazzy/src/fake_gps_drift' returned '0': DEBUGINFOD_URLS=https://debuginfod.ubuntu.com PYTHONPATH=/home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift/prefix_override:/usr/lib/python3/dist-packages/colcon_core/task/python/colcon_distutils_commands:/home/boko/airship_simulation_ros_jazzy/install/fake_gps_drift/lib/python3.12/site-packages:${PYTHONPATH} /usr/bin/python3 -W ignore:setup.py install is deprecated -W ignore:easy_install command is deprecated setup.py egg_info --egg-base ../../build/fake_gps_drift build --build-base /home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift/build install --record /home/boko/airship_simulation_ros_jazzy/build/fake_gps_drift/install.log --single-version-externally-managed install_data --force
