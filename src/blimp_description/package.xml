@@ -9,34 +9,47 @@
 
   <buildtool_depend>ament_cmake</buildtool_depend>
   
-  <!-- ROS2 replacements for ROS1 packages -->
+  <!-- ROS2 Core -->
   <depend>rclcpp</depend>
   <depend>rclpy</depend>
   <depend>robot_state_publisher</depend>
   <depend>joint_state_publisher</depend>
   <depend>joint_state_publisher_gui</depend>
   <depend>xacro</depend>
+  
+  <!-- ROS2 Control -->
   <depend>ros2_control</depend>
   <depend>ros2_controllers</depend>
+  <depend>gz_ros2_control</depend>
   
-  <!-- Gazebo -->
+  <!-- Gazebo Harmonic -->
   <depend>ros_gz_sim</depend>
+  <depend>ros_gz_bridge</depend>
+  <depend>ros_gz_interfaces</depend>
   <depend>gz_sim_vendor</depend>
   
-  <!-- Messages -->
+  <!-- Messages and TF -->
   <depend>geometry_msgs</depend>
   <depend>std_msgs</depend>
   <depend>std_srvs</depend>
   <depend>sensor_msgs</depend>
+  <depend>nav_msgs</depend>
   <depend>tf2</depend>
   <depend>tf2_ros</depend>
+  <depend>tf2_geometry_msgs</depend>
   
   <!-- Visualization -->
   <depend>rviz2</depend>
+  <depend>rviz_common</depend>
+  <depend>rviz_default_plugins</depend>
   
-  <!-- Custom packages (need migration) -->
-  <!-- <depend>mav_msgs</depend> --> <!-- Will need ROS2 version -->
-  <!-- <depend>rotors_comm</depend> --> <!-- Phase 2 replacement -->
+  <!-- MAVLink support (temporary for LibrePilot bridge) -->
+  <depend>mavros_msgs</depend>
+  
+  <!-- Custom packages (need migration or ROS2 versions) -->
+  <!-- TODO: Replace with ROS2 equivalents -->
+  <!-- <depend>mav_msgs</depend> --> 
+  <!-- <depend>rotors_comm</depend> -->
   
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

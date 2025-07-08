@@ -1,0 +1,12 @@
+min_x: -50.0
+min_y: -50.0
+n_x: 100
+n_y: 100
+res_x: 1.0
+res_y: 1.0
+vertical_spacing_factors: 1.0 2.0 3.0
+bottom_z: 0.0 10.0 20.0
+top_z: 10.0 20.0 30.0
+u: [wind velocity u-component data array]
+v: [wind velocity v-component data array]
+w: [wind velocity w-component data array]

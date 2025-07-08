@@ -520,4 +520,95 @@
       		<child link="right_elv_part2_link" />
     	</joint>
 
+
+<!-- IMU sensor link -->
+<link name="imu_link">
+	<inertial>
+		<mass value="0.015"/>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001"/>
+	</inertial>
+	<visual>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry>
+			<box size="0.02 0.02 0.01"/>
+		</geometry>
+		<material name="imu_material">
+			<color rgba="0.1 0.1 0.8 1.0"/>
+		</material>
+	</visual>
+	<collision>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry>
+			<box size="0.02 0.02 0.01"/>
+		</geometry>
+	</collision>
+</link>
+
+<joint name="blimp_body_imu_joint" type="fixed">
+	<origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
+	<parent link="blimp_body_link"/>
+	<child link="imu_link"/>
+</joint>
+
+<!-- GPS sensor link -->
+<link name="gps_link">
+	<inertial>
+		<mass value="0.015"/>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001"/>
+	</inertial>
+	<visual>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry>
+			<cylinder radius="0.02" length="0.05"/>
+		</geometry>
+		<material name="gps_material">
+			<color rgba="0.8 0.8 0.1 1.0"/>
+		</material>
+	</visual>
+	<collision>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry>
+			<cylinder radius="0.02" length="0.05"/>
+		</geometry>
+	</collision>
+</link>
+
+<joint name="blimp_body_gps_joint" type="fixed">
+	<origin xyz="0.0 0.0 0.1" rpy="0 0 0"/>
+	<parent link="blimp_body_link"/>
+	<child link="gps_link"/>
+</joint>
+
+<!-- Magnetometer sensor link -->
+<link name="magnetometer_link">
+	<inertial>
+		<mass value="0.010"/>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001"/>
+	</inertial>
+	<visual>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry>
+			<box size="0.015 0.015 0.008"/>
+		</geometry>
+		<material name="mag_material">
+			<color rgba="0.8 0.1 0.1 1.0"/>
+		</material>
+	</visual>
+	<collision>
+		<origin xyz="0 0 0" rpy="0 0 0"/>
+		<geometry>
+			<box size="0.015 0.015 0.008"/>
+		</geometry>
+	</collision>
+</link>
+
+<joint name="blimp_body_magnetometer_joint" type="fixed">
+	<origin xyz="0.05 0.0 0.0" rpy="0 0 0"/>
+	<parent link="blimp_body_link"/>
+	<child link="magnetometer_link"/>
+</joint>
+
 </robot>

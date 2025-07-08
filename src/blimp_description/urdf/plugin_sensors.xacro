@@ -2,7 +2,7 @@
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
 
   <!-- Include component snippets for macro definitions -->
-  <xacro:include filename="$(find-pkg-share blimp_description)/urdf/plugin_component_snippets.xacro" />
+  <xacro:include filename="$(find blimp_description)/urdf/plugin_component_snippets.xacro" />
 
   <!-- =============================================================== -->
   <!-- ==================== IMU SENSOR MACRO ======================= -->

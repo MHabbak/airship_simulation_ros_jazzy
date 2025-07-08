@@ -1,0 +1,78 @@
+Panels:
+  - Class: rviz_common/Displays
+    Name: Displays
+    Property Tree Widget:
+      Expanded:
+        - /Global Options1
+        - /Machine1_Debug1
+        - /Machine2_Debug1
+        - /Machine3_Debug1
+        - /Machine4_Debug1
+Visualization Manager:
+  Displays:
+    - Alpha: 0.5
+      Class: rviz_default_plugins/Grid
+      Name: Grid
+      Value: true
+    # Blimp 1
+    - Alpha: 1
+      Class: rviz_default_plugins/RobotModel
+      Description Topic:
+        Value: /machine1/robot_description
+      Name: Machine1
+      TF Prefix: "machine1"
+      Value: true
+    # Blimp 2
+    - Alpha: 1
+      Class: rviz_default_plugins/RobotModel
+      Description Topic:
+        Value: /machine2/robot_description
+      Name: Machine2
+      TF Prefix: "machine2"
+      Value: true
+    # Blimp 3
+    - Alpha: 1
+      Class: rviz_default_plugins/RobotModel
+      Description Topic:
+        Value: /machine3/robot_description
+      Name: Machine3
+      TF Prefix: "machine3"
+      Value: true
+    # Blimp 4
+    - Alpha: 1
+      Class: rviz_default_plugins/RobotModel
+      Description Topic:
+        Value: /machine4/robot_description
+      Name: Machine4
+      TF Prefix: "machine4"
+      Value: true
+    # Individual odometry displays
+    - Class: rviz_default_plugins/Odometry
+      Name: Machine1_Odometry
+      Topic:
+        Value: /machine1/ground_truth/odometry
+    - Class: rviz_default_plugins/Odometry
+      Name: Machine2_Odometry
+      Topic:
+        Value: /machine2/ground_truth/odometry
+    - Class: rviz_default_plugins/Odometry
+      Name: Machine3_Odometry
+      Topic:
+        Value: /machine3/ground_truth/odometry
+    - Class: rviz_default_plugins/Odometry
+      Name: Machine4_Odometry
+      Topic:
+        Value: /machine4/ground_truth/odometry
+  Global Options:
+    Fixed Frame: world
+  Views:
+    Current:
+      Class: rviz_default_plugins/Orbit
+      Distance: 35.0
+      Focal Point:
+        X: 0
+        Y: 0
+        Z: 5
+Window Geometry:
+  Width: 2122
+  Height: 1151

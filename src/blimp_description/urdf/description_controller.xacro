@@ -1,11 +1,8 @@
 <?xml version="1.0" ?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
 
-	<!-- ROS2 Control Interface -->
+	<!-- ROS2 Control Interface - Actually call it! -->
 	<xacro:ros2_control_interface namespace="${namespace}" />
-
-	<!-- Controller Plugin -->
-	<xacro:controller_plugin_macro namespace="${namespace}" imu_sub_topic="imu" />
 
 	<!-- Instantiate mavlink telemetry interface (placeholder for PX4 migration) -->
 	<xacro:if value="$(arg enable_mavlink_interface)">
@@ -66,6 +63,32 @@
 		actuator_name="motor1">
 	</xacro:transmission_macro>
 	
-	<!-- Additional transmissions... -->
+	<xacro:transmission_macro
+		namespace="${namespace}"
+		joint_name="bot_rud_part1_bot_rud_joint_link_joint"
+		trans_name="tran2"
+		actuator_name="motor2">
+	</xacro:transmission_macro>
+	
+	<xacro:transmission_macro
+		namespace="${namespace}"
+		joint_name="top_rud_part1_top_rud_joint_link_joint"
+		trans_name="tran3"
+		actuator_name="motor3">
+	</xacro:transmission_macro>
+	
+	<xacro:transmission_macro
+		namespace="${namespace}"
+		joint_name="left_elv_part1_left_elv_joint_link_joint"
+		trans_name="tran4"
+		actuator_name="motor4">
+	</xacro:transmission_macro>
+	
+	<xacro:transmission_macro
+		namespace="${namespace}"
+		joint_name="right_elv_part1_right_elv_joint_link_joint"
+		trans_name="tran5"
+		actuator_name="motor5">
+	</xacro:transmission_macro>
 
 </robot>

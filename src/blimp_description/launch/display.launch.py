@@ -6,6 +6,7 @@ from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
 from launch.substitutions import LaunchConfiguration, Command
 from launch_ros.actions import Node
+from launch_ros.parameter_descriptions import ParameterValue
 
 def generate_launch_description():
     # Package Directories
@@ -14,19 +15,28 @@ def generate_launch_description():
     # Launch Arguments
     use_sim_time = LaunchConfiguration('use_sim_time')
     rvizconfig = LaunchConfiguration('rvizconfig')
+    uav_name = LaunchConfiguration('uav_name')
     
     # Paths
     xacro_file = os.path.join(pkg_blimp_description, 'urdf', 'blimp_base.xacro')
     rviz_config_file = os.path.join(pkg_blimp_description, 'rviz', 'display.rviz')
     
-    # Robot description from xacro
-    robot_description = Command([
-        'xacro ', xacro_file,
-        ' enable_meshes:=true',
-        ' enable_wind:=false',
-        ' enable_physics:=false',
-        ' enable_sensors:=false',
-    ])
+    # Robot description from xacro - WITH ALL REQUIRED ARGS
+    robot_description = ParameterValue(
+        Command([
+            'xacro ', xacro_file,
+            ' uav_name:=', uav_name,
+            ' namespace:=', uav_name,
+            ' enable_meshes:=true',
+            ' enable_wind:=false',
+            ' enable_physics:=false',
+            ' enable_sensors:=false',
+            ' enable_logging:=false',
+            ' enable_ground_truth:=false',
+            ' enable_mavlink_interface:=false',
+        ]),
+        value_type=str
+    )
     
     # Nodes
     robot_state_publisher = Node(
@@ -57,6 +67,7 @@ def generate_launch_description():
     return LaunchDescription([
         # Declare arguments
         DeclareLaunchArgument('use_sim_time', default_value='false'),
+        DeclareLaunchArgument('uav_name', default_value='blimp'),
         DeclareLaunchArgument('rvizconfig', default_value=rviz_config_file),
         
         # Launch nodes

@@ -1,0 +1,17 @@
+# blimp vehicle parameters - Updated for ROS2/Gazebo Harmonic
+mass: 4.620
+inertia: {xx: 7.477239, xy: 0.0, xz: 0.0, yy: 7.477239, yz: 0.0, zz: 2.871145}
+
+# angle should be expressed in rad
+# direction 1 means counter clockwise, -1 clockwise
+# Updated for built-in Gazebo multirotor plugins instead of rotors_simulator
+rotor_configuration:
+  '0': {angle: 1.57079632679, arm_length: 0.21, rotor_force_constant: 9.9865e-06, rotor_moment_constant: 1.6e-2, direction: 1.0}
+  '1': {angle: -1.57079632679, arm_length: 0.21, rotor_force_constant: 9.9865e-06, rotor_moment_constant: 1.6e-2, direction: -1.0}
+  '2': {angle: 3.14159265359, arm_length: 0.21, rotor_force_constant: 9.9865e-06, rotor_moment_constant: 1.6e-2, direction: 1.0}
+  '3': {angle: -1.57079632679, arm_length: 0.21, rotor_force_constant: 9.9865e-06, rotor_moment_constant: 1.6e-2, direction: 1.0}
+
+# Additional parameters for PX4 integration (future migration)
+px4_config:
+  vehicle_type: "vtol_standard"
+  airframe: "blimp_generic"

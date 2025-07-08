@@ -63,7 +63,7 @@ def generate_launch_description():
         output='screen'
     )
     
-    # Spawn entity in Gazebo
+    # Spawn entity in Gazebo using ros_gz_sim for Gazebo Harmonic
     spawn_entity = Node(
         package='ros_gz_sim',
         executable='create',
@@ -71,7 +71,7 @@ def generate_launch_description():
         output='screen',
         arguments=[
             '-name', uav_name,
-            '-topic', PathJoinSubstitution(['/', namespace, '/robot_description']),
+            '-topic', [namespace, '/robot_description'],
             '-x', x,
             '-y', y,
             '-z', z,

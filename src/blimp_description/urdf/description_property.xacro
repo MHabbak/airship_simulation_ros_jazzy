@@ -18,6 +18,27 @@
 	<xacro:property name="mesh_file_blimp_rud_part2" value="package://blimp_description/meshes/blimp_fin/blimp_top_rud_part2_v5.dae" />
 	<xacro:property name="mesh_file_blimp_bot_rud_part1" value="package://blimp_description/meshes/blimp_fin/blimp_bot_rud_part1_v3.dae" />
 
+	<!-- Volume and gas properties -->
+	<xacro:property name="volume_total" value="${volume_blimp_body}" />
+	<xacro:property name="helium_mass" value="1.723" /> <!-- kg -->
+
+	<!-- Sensor noise parameters for Gazebo Harmonic -->
+	<xacro:property name="gyroscope_noise_density" value="0.0003394" />
+	<xacro:property name="gyroscope_random_walk" value="0.000038785" />
+	<xacro:property name="gyroscope_bias_correlation_time" value="1000.0" />
+	<xacro:property name="gyroscope_turn_on_bias_sigma" value="0.0087" />
+	<xacro:property name="accelerometer_noise_density" value="0.004" />
+	<xacro:property name="accelerometer_random_walk" value="0.006" />
+	<xacro:property name="accelerometer_bias_correlation_time" value="300.0" />
+	<xacro:property name="accelerometer_turn_on_bias_sigma" value="0.1960" />
+
+	<!-- Additional missing fin definitions -->
+	<xacro:property name="area_fin_total" value="${area_fin * 6}" /> <!-- 6 fins total -->
+	<xacro:property name="area_body_side" value="5.0" /> <!-- Side projection area -->
+
+	<!-- Gazebo Harmonic controller parameters -->
+	<xacro:property name="controller_update_rate" value="100" /> <!-- Hz -->
+
 	<!-- mass [kg] -->
 	<!-- Modified mass for convenience -->
 	<xacro:property name="mass_blimp_body" value="4.622" />
@@ -90,7 +111,7 @@
 	<xacro:property name="area_body_front" value="3.14"/> <!-- [m^2] -->
 
 	<!-- inertia [kg m^2] [kg m^2] [kg m^2] [kg m^2] [kg m^2] [kg m^2] -->
-	<xacro:include filename="$(find-pkg-share blimp_description)/urdf/inertia_calculator.xacro"/>
+	<xacro:include filename="$(find blimp_description)/urdf/inertia_calculator.xacro"/>
 	<xacro:property name="inertia_blimp_body">
     		<xacro:hollow_cylinder_inertia r1="${radius_blimp_body - length_blimp_skin}" r2="${radius_blimp_body}" h="${length_blimp_body}" mass="${mass_blimp_body_without_gas}"/> <!--TODO: better use hollow ellipse-->
 	</xacro:property>
