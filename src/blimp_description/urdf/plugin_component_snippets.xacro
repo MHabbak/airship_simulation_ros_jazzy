@@ -1,0 +1,657 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+  <xacro:property name="pi" value="3.14159265359" />
+
+  <!-- =============================================================== -->
+  <!-- ==================== LOGGING MACRO ========================== -->
+  <!-- =============================================================== -->
+  <!-- Macro to add logging to Gazebo Harmonic -->
+  <xacro:macro name="bag_plugin_macro"
+    params="namespace bag_file rotor_velocity_slowdown_sim wait_to_record_bag">
+    <gazebo>
+      <plugin filename="gz-sim-log-system" name="gz::sim::systems::LogRecord">
+        <record_path>${bag_file}</record_path>
+        <record_resources>true</record_resources>
+        <record_topic_regex>.*</record_topic_regex>
+        <compress>true</compress>
+        <ros>
+          <namespace>${namespace}</namespace>
+        </ros>
+      </plugin>
+    </gazebo>
+  </xacro:macro>
+
+  <!-- =============================================================== -->
+  <!-- ==================== CAMERA MACROS ========================== -->
+  <!-- =============================================================== -->
+  <!-- Generic camera macro -->
+  <xacro:macro name="camera_macro"
+    params="namespace parent_link camera_suffix frame_rate horizontal_fov
+      image_width image_height image_format min_distance max_distance
+      noise_mean noise_stddev enable_visual *mesh *origin">
+    
+    <!-- Camera link -->
+    <link name="camera_${camera_suffix}_link">
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <xacro:insert_block name="mesh" />
+        </geometry>
+      </collision>
+      <xacro:if value="${enable_visual}">
+        <visual>
+          <origin xyz="0 0 0" rpy="0 0 0" />
+          <geometry>
+            <xacro:insert_block name="mesh" />
+          </geometry>
+          <material name="camera_material">
+            <color rgba="0.1 0.1 0.1 1.0"/>
+          </material>
+        </visual>
+      </xacro:if>
+      <inertial>
+        <mass value="1e-5" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+      </inertial>
+    </link>
+
+    <!-- Camera joint -->
+    <joint name="camera_${camera_suffix}_joint" type="fixed">
+      <xacro:insert_block name="origin" />
+      <parent link="${parent_link}" />
+      <child link="camera_${camera_suffix}_link" />
+    </joint>
+
+    <!-- Gazebo Harmonic camera sensor -->
+    <gazebo reference="camera_${camera_suffix}_link">
+      <sensor name="camera_${camera_suffix}" type="camera">
+        <always_on>true</always_on>
+        <update_rate>${frame_rate}</update_rate>
+        <camera>
+          <horizontal_fov>${horizontal_fov}</horizontal_fov>
+          <image>
+            <width>${image_width}</width>
+            <height>${image_height}</height>
+            <format>${image_format}</format>
+          </image>
+          <clip>
+            <near>${min_distance}</near>
+            <far>${max_distance}</far>
+          </clip>
+          <noise>
+            <type>gaussian</type>
+            <mean>${noise_mean}</mean>
+            <stddev>${noise_stddev}</stddev>
+          </noise>
+        </camera>
+        <plugin filename="gz-sim-camera-system" name="gz::sim::systems::Camera">
+          <ros>
+            <namespace>${namespace}</namespace>
+            <remapping>~/image:=camera_${camera_suffix}/image_raw</remapping>
+            <remapping>~/camera_info:=camera_${camera_suffix}/camera_info</remapping>
+          </ros>
+        </plugin>
+      </sensor>
+    </gazebo>
+  </xacro:macro>
+
+  <!-- Stereo camera macro -->
+  <xacro:macro name="stereo_camera_macro"
+    params="namespace camera_name parent_link frame_rate horizontal_fov
+      image_width image_height image_format min_distance max_distance
+      noise_mean noise_stddev enable_visual origin_offset_x baseline_y origin_offset_z *geometry">
+    
+    <!-- Left camera -->
+    <link name="${camera_name}_left_link">
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <xacro:insert_block name="geometry" />
+        </geometry>
+      </collision>
+      <xacro:if value="${enable_visual}">
+        <visual>
+          <origin xyz="0 0 0" rpy="0 0 0" />
+          <geometry>
+            <xacro:insert_block name="geometry" />
+          </geometry>
+          <material name="camera_material">
+            <color rgba="0.1 0.1 0.1 1.0"/>
+          </material>
+        </visual>
+      </xacro:if>
+      <inertial>
+        <mass value="1e-5" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+      </inertial>
+    </link>
+
+    <!-- Right camera -->
+    <link name="${camera_name}_right_link">
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <xacro:insert_block name="geometry" />
+        </geometry>
+      </collision>
+      <xacro:if value="${enable_visual}">
+        <visual>
+          <origin xyz="0 0 0" rpy="0 0 0" />
+          <geometry>
+            <xacro:insert_block name="geometry" />
+          </geometry>
+          <material name="camera_material">
+            <color rgba="0.1 0.1 0.1 1.0"/>
+          </material>
+        </visual>
+      </xacro:if>
+      <inertial>
+        <mass value="1e-5" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+      </inertial>
+    </link>
+
+    <!-- Left camera joint -->
+    <joint name="${camera_name}_left_joint" type="fixed">
+      <origin xyz="${origin_offset_x} ${baseline_y/2} ${origin_offset_z}" rpy="0 0 0" />
+      <parent link="${parent_link}" />
+      <child link="${camera_name}_left_link" />
+    </joint>
+
+    <!-- Right camera joint -->
+    <joint name="${camera_name}_right_joint" type="fixed">
+      <origin xyz="${origin_offset_x} ${-baseline_y/2} ${origin_offset_z}" rpy="0 0 0" />
+      <parent link="${parent_link}" />
+      <child link="${camera_name}_right_link" />
+    </joint>
+
+    <!-- Left camera sensor -->
+    <gazebo reference="${camera_name}_left_link">
+      <sensor name="${camera_name}_left" type="camera">
+        <always_on>true</always_on>
+        <update_rate>${frame_rate}</update_rate>
+        <camera>
+          <horizontal_fov>${horizontal_fov}</horizontal_fov>
+          <image>
+            <width>${image_width}</width>
+            <height>${image_height}</height>
+            <format>${image_format}</format>
+          </image>
+          <clip>
+            <near>${min_distance}</near>
+            <far>${max_distance}</far>
+          </clip>
+          <noise>
+            <type>gaussian</type>
+            <mean>${noise_mean}</mean>
+            <stddev>${noise_stddev}</stddev>
+          </noise>
+        </camera>
+        <plugin filename="gz-sim-camera-system" name="gz::sim::systems::Camera">
+          <ros>
+            <namespace>${namespace}</namespace>
+            <remapping>~/image:=${camera_name}/left/image_raw</remapping>
+            <remapping>~/camera_info:=${camera_name}/left/camera_info</remapping>
+          </ros>
+        </plugin>
+      </sensor>
+    </gazebo>
+
+    <!-- Right camera sensor -->
+    <gazebo reference="${camera_name}_right_link">
+      <sensor name="${camera_name}_right" type="camera">
+        <always_on>true</always_on>
+        <update_rate>${frame_rate}</update_rate>
+        <camera>
+          <horizontal_fov>${horizontal_fov}</horizontal_fov>
+          <image>
+            <width>${image_width}</width>
+            <height>${image_height}</height>
+            <format>${image_format}</format>
+          </image>
+          <clip>
+            <near>${min_distance}</near>
+            <far>${max_distance}</far>
+          </clip>
+          <noise>
+            <type>gaussian</type>
+            <mean>${noise_mean}</mean>
+            <stddev>${noise_stddev}</stddev>
+          </noise>
+        </camera>
+        <plugin filename="gz-sim-camera-system" name="gz::sim::systems::Camera">
+          <ros>
+            <namespace>${namespace}</namespace>
+            <remapping>~/image:=${camera_name}/right/image_raw</remapping>
+            <remapping>~/camera_info:=${camera_name}/right/camera_info</remapping>
+          </ros>
+        </plugin>
+      </sensor>
+    </gazebo>
+  </xacro:macro>
+
+  <!-- =============================================================== -->
+  <!-- ==================== WIND PLUGIN MACRO ====================== -->
+  <!-- =============================================================== -->
+  <xacro:macro name="wind_plugin_macro"
+    params="namespace xyz_offset wind_direction wind_force_mean
+      wind_gust_direction wind_gust_duration wind_gust_start
+      wind_gust_force_mean wind_speed_mean use_custom_static_wind_field 
+      custom_wind_field_path">
+    <gazebo>
+      <plugin filename="gz-sim-wind-effects-system" name="gz::sim::systems::WindEffects">
+        <horizontal>
+          <magnitude>
+            <time_for_rise>10</time_for_rise>
+            <sin>
+              <amplitude_percent>0.05</amplitude_percent>
+              <period>60</period>
+            </sin>
+            <noise type="gaussian">
+              <mean>${wind_speed_mean}</mean>
+              <stddev>1.0</stddev>
+            </noise>
+          </magnitude>
+          <direction>
+            <time_for_rise>30</time_for_rise>
+            <sin>
+              <amplitude>0.1</amplitude>
+              <period>5</period>
+            </sin>
+            <noise type="gaussian">
+              <mean>${wind_direction}</mean>
+              <stddev>0.03</stddev>
+            </noise>
+          </direction>
+        </horizontal>
+        <vertical>
+          <noise type="gaussian">
+            <mean>0</mean>
+            <stddev>0.1</stddev>
+          </noise>
+        </vertical>
+        <ros>
+          <namespace>${namespace}</namespace>
+          <remapping>~/wind_speed:=wind_speed</remapping>
+        </ros>
+      </plugin>
+    </gazebo>
+  </xacro:macro>
+
+  <!-- =============================================================== -->
+  <!-- ==================== MAGNETOMETER MACRO ===================== -->
+  <!-- =============================================================== -->
+  <xacro:macro name="magnetometer_plugin_macro"
+    params="namespace magnetometer_suffix parent_link magnetometer_topic
+      mass_magnetometer_sensor ref_mag_north ref_mag_east ref_mag_down
+      noise_normal noise_uniform_initial_bias *inertia *origin">
+    
+    <!-- Magnetometer link -->
+    <link name="magnetometer${magnetometer_suffix}_link">
+      <inertial>
+        <xacro:insert_block name="inertia" />
+        <mass value="${mass_magnetometer_sensor}" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+      </inertial>
+    </link>
+
+    <!-- Magnetometer joint -->
+    <joint name="magnetometer${magnetometer_suffix}_joint" type="revolute">
+      <xacro:insert_block name="origin" />
+      <parent link="${parent_link}" />
+      <child link="magnetometer${magnetometer_suffix}_link" />
+      <limit upper="0" lower="0" effort="0" velocity="0" />
+    </joint>
+
+    <!-- Gazebo Harmonic magnetometer sensor -->
+    <gazebo reference="magnetometer${magnetometer_suffix}_link">
+      <sensor name="magnetometer${magnetometer_suffix}" type="magnetometer">
+        <always_on>true</always_on>
+        <update_rate>100</update_rate>
+        <magnetometer>
+          <x>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>0.000000080</stddev>
+              <bias_mean>0.000000400</bias_mean>
+              <bias_stddev>0.000000400</bias_stddev>
+            </noise>
+          </x>
+          <y>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>0.000000080</stddev>
+              <bias_mean>0.000000400</bias_mean>
+              <bias_stddev>0.000000400</bias_stddev>
+            </noise>
+          </y>
+          <z>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>0.000000080</stddev>
+              <bias_mean>0.000000400</bias_mean>
+              <bias_stddev>0.000000400</bias_stddev>
+            </noise>
+          </z>
+        </magnetometer>
+        <plugin filename="gz-sim-magnetometer-system" name="gz::sim::systems::Magnetometer">
+          <ros>
+            <namespace>${namespace}</namespace>
+            <remapping>~/out:=${magnetometer_topic}</remapping>
+          </ros>
+        </plugin>
+      </sensor>
+    </gazebo>
+  </xacro:macro>
+
+  <!-- =============================================================== -->
+  <!-- ==================== PRESSURE SENSOR MACRO ================== -->
+  <!-- =============================================================== -->
+  <xacro:macro name="pressure_sensor_plugin_macro"
+    params="namespace pressure_sensor_suffix parent_link pressure_topic
+      mass_pressure_sensor reference_altitude pressure_variance *inertia *origin">
+    
+    <!-- Pressure sensor link -->
+    <link name="pressure_sensor${pressure_sensor_suffix}_link">
+      <inertial>
+        <xacro:insert_block name="inertia" />
+        <mass value="${mass_pressure_sensor}" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+      </inertial>
+    </link>
+
+    <!-- Pressure sensor joint -->
+    <joint name="pressure_sensor${pressure_sensor_suffix}_joint" type="revolute">
+      <xacro:insert_block name="origin" />
+      <parent link="${parent_link}" />
+      <child link="pressure_sensor${pressure_sensor_suffix}_link" />
+      <limit upper="0" lower="0" effort="0" velocity="0" />
+    </joint>
+
+    <!-- Gazebo Harmonic air pressure sensor -->
+    <gazebo reference="pressure_sensor${pressure_sensor_suffix}_link">
+      <sensor name="air_pressure${pressure_sensor_suffix}" type="air_pressure">
+        <always_on>true</always_on>
+        <update_rate>50</update_rate>
+        <air_pressure>
+          <reference_altitude>${reference_altitude}</reference_altitude>
+          <noise type="gaussian">
+            <mean>0.0</mean>
+            <stddev>${pressure_variance}</stddev>
+          </noise>
+        </air_pressure>
+        <plugin filename="gz-sim-air-pressure-system" name="gz::sim::systems::AirPressure">
+          <ros>
+            <namespace>${namespace}</namespace>
+            <remapping>~/out:=${pressure_topic}</remapping>
+          </ros>
+        </plugin>
+      </sensor>
+    </gazebo>
+  </xacro:macro>
+
+  <!-- =============================================================== -->
+  <!-- ==================== VI SENSOR MACROS ======================= -->
+  <!-- =============================================================== -->
+  <!-- VI sensor camera macro -->
+  <xacro:macro name="vi_sensor_camera_macro"
+    params="namespace parent_link camera_suffix frame_rate *origin">
+    <xacro:camera_macro
+      namespace="${namespace}"
+      parent_link="${parent_link}"
+      camera_suffix="${camera_suffix}"
+      frame_rate="${frame_rate}"
+      horizontal_fov="1.3962634"
+      image_width="752"
+      image_height="480"
+      image_format="L8"
+      min_distance="0.02"
+      max_distance="30"
+      noise_mean="0.0"
+      noise_stddev="0.007"
+      enable_visual="true">
+      <mesh filename="package://blimp_description/meshes/vi_camera.dae" scale="1 1 1" />
+      <xacro:insert_block name="origin" />
+    </xacro:camera_macro>
+  </xacro:macro>
+
+  <!-- VI sensor stereo camera macro -->
+  <xacro:macro name="vi_sensor_stereo_camera_macro"
+    params="namespace parent_link frame_rate origin_offset_x baseline_y origin_offset_z max_range">
+    <xacro:stereo_camera_macro
+      namespace="${namespace}"
+      camera_name="vi_sensor"
+      parent_link="${parent_link}"
+      frame_rate="${frame_rate}"
+      horizontal_fov="1.3962634"
+      image_width="752"
+      image_height="480"
+      image_format="L8"
+      min_distance="0.02"
+      max_distance="${max_range}"
+      noise_mean="0.0"
+      noise_stddev="0.007"
+      enable_visual="false"
+      origin_offset_x="${origin_offset_x}"
+      baseline_y="${baseline_y}"
+      origin_offset_z="${origin_offset_z}" >
+      <cylinder length="0.01" radius="0.007" />
+    </xacro:stereo_camera_macro>
+  </xacro:macro>
+
+  <!-- VI sensor depth camera macro -->
+  <xacro:macro name="vi_sensor_depth_macro"
+    params="namespace parent_link camera_suffix frame_rate max_range *origin">
+    
+    <!-- Depth camera link -->
+    <link name="camera_${camera_suffix}_link">
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <cylinder length="0.01" radius="0.007" />
+        </geometry>
+      </collision>
+      <inertial>
+        <mass value="1e-5" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+      </inertial>
+    </link>
+
+    <!-- Depth camera joint -->
+    <joint name="camera_${camera_suffix}_joint" type="fixed">
+      <xacro:insert_block name="origin" />
+      <parent link="${parent_link}" />
+      <child link="camera_${camera_suffix}_link" />
+    </joint>
+
+    <!-- Gazebo Harmonic depth camera sensor -->
+    <gazebo reference="camera_${camera_suffix}_link">
+      <sensor name="camera_${camera_suffix}" type="depth_camera">
+        <always_on>true</always_on>
+        <update_rate>${frame_rate}</update_rate>
+        <camera>
+          <horizontal_fov>1.3962634</horizontal_fov>
+          <image>
+            <width>752</width>
+            <height>480</height>
+            <format>R_FLOAT32</format>
+          </image>
+          <clip>
+            <near>0.02</near>
+            <far>${max_range}</far>
+          </clip>
+          <noise>
+            <type>gaussian</type>
+            <mean>0.0</mean>
+            <stddev>0.007</stddev>
+          </noise>
+        </camera>
+        <plugin filename="gz-sim-depth-camera-system" name="gz::sim::systems::DepthCamera">
+          <ros>
+            <namespace>${namespace}</namespace>
+            <remapping>~/depth_image:=camera_${camera_suffix}/depth/image_raw</remapping>
+            <remapping>~/point_cloud:=camera_${camera_suffix}/depth/points</remapping>
+            <remapping>~/camera_info:=camera_${camera_suffix}/depth/camera_info</remapping>
+          </ros>
+        </plugin>
+      </sensor>
+    </gazebo>
+  </xacro:macro>
+
+  <!-- Complete VI sensor macro -->
+  <xacro:macro name="vi_sensor_macro" params="namespace parent_link enable_cameras enable_depth enable_ground_truth *origin">
+    <!-- Vi Sensor Link -->
+    <link name="vi_sensor_link">
+      <collision>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <box size="0.03 0.133 0.057" />
+        </geometry>
+      </collision>
+      <visual>
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <geometry>
+          <mesh filename="package://blimp_description/meshes/vi_sensor.dae" scale="1 1 1" />
+        </geometry>
+      </visual>
+      <inertial>
+        <mass value="0.13" />
+        <origin xyz="0 0 0" rpy="0 0 0" />
+        <inertia ixx="1e-6" ixy="0" ixz="0" iyy="1e-6" iyz="0" izz="1e-6" />
+      </inertial>
+    </link>
+
+    <joint name="${namespace}_vi_sensor_joint" type="fixed">
+      <xacro:insert_block name="origin" />
+      <parent link="${parent_link}" />
+      <child link="vi_sensor_link" />
+    </joint>
+
+    <!-- Cameras -->
+    <xacro:if value="${enable_cameras}">
+      <xacro:vi_sensor_stereo_camera_macro
+        namespace="${namespace}" parent_link="vi_sensor_link"
+        frame_rate="30.0" origin_offset_x="0.015" baseline_y="${0.055*2}"
+        origin_offset_z="0.0065" max_range="30.0">
+      </xacro:vi_sensor_stereo_camera_macro>
+    </xacro:if>
+
+    <!-- Depth Sensor -->
+    <xacro:if value="${enable_depth}">
+      <xacro:vi_sensor_depth_macro
+        namespace="${namespace}" parent_link="vi_sensor_link"
+        camera_suffix="depth" frame_rate="30.0" max_range="10.0">
+        <origin xyz="0.015 0.055 0.0065" rpy="0 0 0" />
+      </xacro:vi_sensor_depth_macro>
+    </xacro:if>
+
+    <!-- Ground truth -->
+    <xacro:if value="${enable_ground_truth}">
+      <xacro:odometry_plugin_macro
+        namespace="ground_truth"
+        odometry_sensor_suffix=""
+        parent_link="vi_sensor_link"
+        pose_topic="pose"
+        pose_with_covariance_topic="pose_with_covariance"
+        position_topic="position"
+        transform_topic="transform"
+        odometry_topic="odometry"
+        parent_frame_id="world"
+        child_frame_id="base_link"
+        mass_odometry_sensor="0.00001"
+        measurement_divisor="1"
+        measurement_delay="0"
+        unknown_delay="0.0"
+        noise_normal_position="0 0 0"
+        noise_normal_quaternion="0 0 0"
+        noise_normal_linear_velocity="0 0 0"
+        noise_normal_angular_velocity="0 0 0"
+        noise_uniform_position="0 0 0"
+        noise_uniform_quaternion="0 0 0"
+        noise_uniform_linear_velocity="0 0 0"
+        noise_uniform_angular_velocity="0 0 0"
+        enable_odometry_map="false"
+        odometry_map=""
+        image_scale="">
+        <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001" />
+        <origin xyz="0.0 0.0 0.0" rpy="0.0 0.0 0.0" />
+      </xacro:odometry_plugin_macro>
+    </xacro:if>
+
+    <!-- ADIS16448 IMU -->
+    <xacro:imu_plugin_macro
+      namespace="${namespace}"
+      imu_suffix=""
+      parent_link="vi_sensor_link"
+      imu_topic="imu"
+      mass_imu_sensor="0.015"
+      gyroscope_noise_density="0.0003394"
+      gyroscope_random_walk="0.000038785"
+      gyroscope_bias_correlation_time="1000.0"
+      gyroscope_turn_on_bias_sigma="0.0087"
+      accelerometer_noise_density="0.004"
+      accelerometer_random_walk="0.006"
+      accelerometer_bias_correlation_time="300.0"
+      accelerometer_turn_on_bias_sigma="0.1960">
+      <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001" />
+      <origin xyz="0.015 0 0.0113" rpy="0 0 0" />
+    </xacro:imu_plugin_macro>
+  </xacro:macro>
+
+  <!-- =============================================================== -->
+  <!-- ==================== CONVENIENCE MACROS ===================== -->
+  <!-- =============================================================== -->
+  
+  <xacro:macro name="default_gps" params="namespace parent_link">
+    <xacro:gps_plugin_macro
+      namespace="${namespace}"
+      gps_suffix=""
+      parent_link="${parent_link}"
+      gps_topic="gps"
+      ground_speed_topic="ground_speed"
+      mass_gps_sensor="0.015"
+      horizontal_pos_std_dev="3.0"
+      vertical_pos_std_dev="6.0"
+      horizontal_vel_std_dev="0.1"
+      vertical_vel_std_dev="0.1">
+      <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001" />
+      <origin xyz="0 0 0" rpy="0 0 0" />
+    </xacro:gps_plugin_macro>
+  </xacro:macro>
+
+  <xacro:macro name="default_magnetometer" params="namespace parent_link">
+    <xacro:magnetometer_plugin_macro
+      namespace="${namespace}"
+      magnetometer_suffix=""
+      parent_link="${parent_link}"
+      magnetometer_topic="magnetic_field"
+      mass_magnetometer_sensor="0.015"
+      ref_mag_north="0.000021493"
+      ref_mag_east="0.000000815"
+      ref_mag_down="0.000042795"
+      noise_normal="0.000000080 0.000000080 0.000000080"
+      noise_uniform_initial_bias="0.000000400 0.000000400 0.000000400">
+      <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001" />
+      <origin xyz="0 0 0" rpy="0 0 0" />
+    </xacro:magnetometer_plugin_macro>
+  </xacro:macro>
+
+  <xacro:macro name="default_pressure_sensor" params="namespace parent_link">
+    <xacro:pressure_sensor_plugin_macro
+      namespace="${namespace}"
+      pressure_sensor_suffix=""
+      parent_link="${parent_link}"
+      pressure_topic="air_pressure"
+      mass_pressure_sensor="0.015"
+      reference_altitude="500.0"
+      pressure_variance="0.0">
+      <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001" />
+      <origin xyz="0 0 0" rpy="0 0 0" />
+    </xacro:pressure_sensor_plugin_macro>
+  </xacro:macro>
+
+</robot>

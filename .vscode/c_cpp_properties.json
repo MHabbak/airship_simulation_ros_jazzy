@@ -1,0 +1,42 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "/usr/include/gz/sim8",
+                "/usr/include/gz/math7",
+                "/usr/include/gz/msgs10",
+                "/usr/include/gz/transport13",
+                "/usr/include/gz/plugin2",
+                "/usr/include/gz/common5",
+                "/usr/include/gz/physics7",
+                "/usr/include/gz/rendering8",
+                "/usr/include/gz/sdformat14",
+                "/usr/include/gz/sensors8",
+                "/usr/include/gz/fuel_tools9",
+                "/usr/include/gz/gui8",
+                "/usr/include/gz/launch7",
+                "/usr/include/gz/utils2",
+                "/usr/include/gz/cmake3",
+                "/usr/include",
+                "/opt/ros/jazzy/include/**"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/gcc",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "linux-gcc-x64",
+            "compileCommands": "${workspaceFolder}/build/compile_commands.json",
+            "browse": {
+                "path": [
+                    "${workspaceFolder}/**",
+                    "/usr/include/gz/**",
+                    "/opt/ros/jazzy/include/**"
+                ],
+                "limitSymbolsToIncludedHeaders": true
+            }
+        }
+    ],
+    "version": 4
+}

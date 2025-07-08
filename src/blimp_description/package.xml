@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>blimp_description</name>
+  <version>0.0.1</version>
+  <description>Blimp robot description for ROS2/Gazebo Harmonic</description>
+
+  <maintainer email="mahabbak@your-email.com">Mohamed Elhabbak</maintainer>
+  <license>Apache 2.0</license>
+
+  <buildtool_depend>ament_cmake</buildtool_depend>
+  
+  <!-- ROS2 replacements for ROS1 packages -->
+  <depend>rclcpp</depend>
+  <depend>rclpy</depend>
+  <depend>robot_state_publisher</depend>
+  <depend>joint_state_publisher</depend>
+  <depend>joint_state_publisher_gui</depend>
+  <depend>xacro</depend>
+  <depend>ros2_control</depend>
+  <depend>ros2_controllers</depend>
+  
+  <!-- Gazebo -->
+  <depend>ros_gz_sim</depend>
+  <depend>gz_sim_vendor</depend>
+  
+  <!-- Messages -->
+  <depend>geometry_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>std_srvs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>tf2</depend>
+  <depend>tf2_ros</depend>
+  
+  <!-- Visualization -->
+  <depend>rviz2</depend>
+  
+  <!-- Custom packages (need migration) -->
+  <!-- <depend>mav_msgs</depend> --> <!-- Will need ROS2 version -->
+  <!-- <depend>rotors_comm</depend> --> <!-- Phase 2 replacement -->
+  
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
+
+  <export>
+    <build_type>ament_cmake</build_type>
+  </export>
+</package>

@@ -1,0 +1,71 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+	<!-- ROS2 Control Interface -->
+	<xacro:ros2_control_interface namespace="${namespace}" />
+
+	<!-- Controller Plugin -->
+	<xacro:controller_plugin_macro namespace="${namespace}" imu_sub_topic="imu" />
+
+	<!-- Instantiate mavlink telemetry interface (placeholder for PX4 migration) -->
+	<xacro:if value="$(arg enable_mavlink_interface)">
+		<xacro:default_mavlink_interface namespace="${namespace}" imu_sub_topic="imu" rotor_count="3" />
+	</xacro:if>
+
+	<!--  Instantiate rotors with Gazebo Harmonic motor model -->
+	<xacro:rotor_macro
+		robot_namespace="${namespace}"
+		joint_name="stick_left_blade_joint"
+		link_name="left_blade_link"
+		direction="ccw"
+		motor_constant="${motor_constant}"
+		moment_constant="${moment_constant}"
+		time_constant_up="${time_constant_up}"
+		time_constant_down="${time_constant_down}"
+		max_rot_velocity="${max_rot_velocity}"
+		motor_number="0"
+		rotor_drag_coefficient="${rotor_drag_coefficient}"
+		rolling_moment_coefficient="${rolling_moment_coefficient}">
+	</xacro:rotor_macro>
+	
+	<xacro:rotor_macro
+		robot_namespace="${namespace}"
+		joint_name="stick_right_blade_joint"
+		link_name="right_blade_link"
+		direction="cw"
+		motor_constant="${motor_constant}"
+		moment_constant="${moment_constant}"
+		time_constant_up="${time_constant_up}"
+		time_constant_down="${time_constant_down}"
+		max_rot_velocity="${max_rot_velocity}"
+		motor_number="1"
+		rotor_drag_coefficient="${rotor_drag_coefficient}"
+		rolling_moment_coefficient="${rolling_moment_coefficient}">
+	</xacro:rotor_macro>
+	
+	<xacro:rotor_macro
+		robot_namespace="${namespace}"
+		joint_name="bot_rud_part1_bot_rud_motor_joint"
+		link_name="bot_rud_motor_link"
+		direction="cw"
+		motor_constant="${motor_constant}"
+		moment_constant="${moment_constant}"
+		time_constant_up="${time_constant_up}"
+		time_constant_down="${time_constant_down}"
+		max_rot_velocity="${max_rot_velocity}"
+		motor_number="2"
+		rotor_drag_coefficient="${rotor_drag_coefficient}"
+		rolling_moment_coefficient="${rolling_moment_coefficient}">
+	</xacro:rotor_macro>
+
+	<!--  Control surface transmissions for ros2_control -->
+	<xacro:transmission_macro
+		namespace="${namespace}"
+		joint_name="base_stick_joint"
+		trans_name="tran1"
+		actuator_name="motor1">
+	</xacro:transmission_macro>
+	
+	<!-- Additional transmissions... -->
+
+</robot>

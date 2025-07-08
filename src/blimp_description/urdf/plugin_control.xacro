@@ -1,0 +1,169 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+
+  <!-- Include component snippets for macro definitions -->
+  <xacro:include filename="$(find-pkg-share blimp_description)/urdf/plugin_component_snippets.xacro" />
+
+  <!-- =============================================================== -->
+  <!-- ==================== ROTOR MOTOR MACRO ====================== -->
+  <!-- =============================================================== -->
+  <xacro:macro name="rotor_macro"
+    params="robot_namespace joint_name link_name direction
+      motor_constant moment_constant time_constant_up time_constant_down
+      max_rot_velocity motor_number rotor_drag_coefficient
+      rolling_moment_coefficient">
+    
+    <!-- Gazebo Harmonic Multicopter Motor Model Plugin -->
+    <gazebo reference="${link_name}">
+      <plugin filename="gz-sim-multicopter-motor-model-system" 
+              name="gz::sim::systems::MulticopterMotorModel">
+        <jointName>${joint_name}</jointName>
+        <linkName>${link_name}</linkName>
+        <turningDirection>${direction}</turningDirection>
+        <timeConstantUp>${time_constant_up}</timeConstantUp>
+        <timeConstantDown>${time_constant_down}</timeConstantDown>
+        <maxRotVelocity>${max_rot_velocity}</maxRotVelocity>
+        <motorConstant>${motor_constant}</motorConstant>
+        <momentConstant>${moment_constant}</momentConstant>
+        <commandSubTopic>command/motor_speed</commandSubTopic>
+        <motorNumber>${motor_number}</motorNumber>
+        <rotorDragCoefficient>${rotor_drag_coefficient}</rotorDragCoefficient>
+        <rollingMomentCoefficient>${rolling_moment_coefficient}</rollingMomentCoefficient>
+        <motorSpeedPubTopic>motor_speed/${motor_number}</motorSpeedPubTopic>
+        <rotorVelocitySlowdownSim>1</rotorVelocitySlowdownSim>
+        <ros>
+          <namespace>${robot_namespace}</namespace>
+        </ros>
+      </plugin>
+    </gazebo>
+  </xacro:macro>
+
+  <!-- =============================================================== -->
+  <!-- ==================== ROS2_CONTROL INTEGRATION =============== -->
+  <!-- =============================================================== -->
+  
+  <!-- ROS2 Control Transmission Macro -->
+  <xacro:macro name="transmission_macro"
+    params="namespace joint_name trans_name actuator_name">
+    <transmission name="${trans_name}">
+      <plugin>transmission_interface/SimpleTransmission</plugin>
+      <actuator name="${actuator_name}" role="actuator1">
+        <mechanicalReduction>1.0</mechanicalReduction>
+      </actuator>
+      <joint name="${joint_name}" role="joint1">
+        <mechanicalReduction>1.0</mechanicalReduction>
+      </joint>
+    </transmission>
+  </xacro:macro>
+
+  <!-- ROS2 Control Hardware Interface -->
+  <xacro:macro name="ros2_control_interface" params="namespace">
+    <ros2_control name="${namespace}_control" type="system">
+      <hardware>
+        <plugin>gz_ros2_control/GazeboSimSystem</plugin>
+      </hardware>
+      
+      <!-- Joint interfaces for control surfaces -->
+      <joint name="base_stick_joint">
+        <command_interface name="position">
+          <param name="min">-${100 * pi /180.0}</param>
+          <param name="max">${100 * pi /180.0}</param>
+        </command_interface>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+      
+      <joint name="bot_rud_part1_bot_rud_joint_link_joint">
+        <command_interface name="position">
+          <param name="min">-${60 * pi /180.0}</param>
+          <param name="max">${60 * pi /180.0}</param>
+        </command_interface>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+      
+      <joint name="top_rud_part1_top_rud_joint_link_joint">
+        <command_interface name="position">
+          <param name="min">-${60 * pi /180.0}</param>
+          <param name="max">${60 * pi /180.0}</param>
+        </command_interface>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+      
+      <joint name="left_elv_part1_left_elv_joint_link_joint">
+        <command_interface name="position">
+          <param name="min">-${60 * pi /180.0}</param>
+          <param name="max">${60 * pi /180.0}</param>
+        </command_interface>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+      
+      <joint name="right_elv_part1_right_elv_joint_link_joint">
+        <command_interface name="position">
+          <param name="min">-${60 * pi /180.0}</param>
+          <param name="max">${60 * pi /180.0}</param>
+        </command_interface>
+        <state_interface name="position"/>
+        <state_interface name="velocity"/>
+        <state_interface name="effort"/>
+      </joint>
+    </ros2_control>
+
+    <!-- Gazebo ROS2 Control Plugin -->
+    <gazebo>
+      <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+        <parameters>$(find-pkg-share blimp_description)/config/blimp_controllers.yaml</parameters>
+        <ros>
+          <namespace>${namespace}</namespace>
+        </ros>
+      </plugin>
+    </gazebo>
+  </xacro:macro>
+
+  <!-- =============================================================== -->
+  <!-- ==================== MAVLINK INTERFACE (PLACEHOLDER) ======== -->
+  <!-- =============================================================== -->
+  <!-- NOTE: This will need to be replaced with PX4/Pixhawk integration later -->
+  
+  <xacro:macro name="default_mavlink_interface" params="namespace imu_sub_topic rotor_count">
+    <!-- Placeholder for future PX4 integration -->
+    <!-- For now, use ROS1_bridge for LibrePilot compatibility -->
+    <gazebo>
+      <plugin filename="gz-sim-joint-state-publisher-system" 
+              name="gz::sim::systems::JointStatePublisher">
+        <ros>
+          <namespace>${namespace}</namespace>
+          <remapping>~/out:=joint_states</remapping>
+        </ros>
+      </plugin>
+    </gazebo>
+  </xacro:macro>
+
+  <!-- =============================================================== -->
+  <!-- ==================== CONTROLLER INTERFACE =================== -->
+  <!-- =============================================================== -->
+  
+  <xacro:macro name="controller_plugin_macro" params="namespace imu_sub_topic">
+    <!-- Custom ROS2 controller interface to replace rotors_simulator controller -->
+    <gazebo>
+      <plugin filename="gz-sim-triggered-publisher-system" name="gz::sim::systems::TriggeredPublisher">
+        <input type="gz.msgs.Twist" topic="/${namespace}/cmd_vel">
+          <match field="linear.x">0.0</match>
+        </input>
+        <output type="gz.msgs.Double" topic="/${namespace}/gazebo/command/motor_speed">
+          <gz_frame_id>world</gz_frame_id>
+        </output>
+        <ros>
+          <namespace>${namespace}</namespace>
+        </ros>
+      </plugin>
+    </gazebo>
+  </xacro:macro>
+
+</robot>

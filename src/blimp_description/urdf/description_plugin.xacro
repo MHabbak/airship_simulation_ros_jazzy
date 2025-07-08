@@ -1,0 +1,562 @@
+<?xml version="1.0" ?>
+<robot xmlns:xacro="http://ros.org/wiki/xacro">
+	
+	<!-- Wind Plugin - Updated for Gazebo Harmonic -->
+	<xacro:if value="$(arg enable_wind)">
+		<gazebo>
+			<!-- Using gz-sim-wind-effects-system for Gazebo Harmonic -->
+			<plugin filename="gz-sim-wind-effects-system" name="wind_effects">
+				<robotNamespace>${namespace}</robotNamespace>
+				<linkName>blimp_body_link</linkName>
+				<!-- Wind vector components (x, y, z) in world frame -->
+				<wind_direction>1.5 1.5 0</wind_direction>
+				<!-- Wind speed magnitude [m/s] -->
+				<wind_speed>1.5</wind_speed>
+				<!-- Enable turbulence -->
+				<turbulence>
+					<intensity>3.0</intensity>
+					<length_scale>10.0</length_scale>
+				</turbulence>
+				<!-- Optional: Custom wind field (if using file) -->
+				<!-- <wind_field_file>$(find blimp_description)/worlds/wind_field.txt</wind_field_file> -->
+			</plugin>
+		</gazebo>
+	</xacro:if>
+
+	<!-- Aerodynamic Forces - Custom plugins maintained but updated syntax -->
+	<xacro:if value="$(arg enable_physics)">
+		
+		<!-- Body lift properties -->
+		<xacro:property name="body_lift_liftdrag_upward">
+			<upward>0 1 0</upward> 
+		</xacro:property>
+		<xacro:property name="body_lift_liftdrag_forward">
+			<forward>1 0 0</forward>  
+		</xacro:property>
+		<xacro:property name="body_lift_liftdrag_cp">
+			<cp>0 0 0</cp>
+		</xacro:property>
+		
+		<!-- Fin properties -->
+		<xacro:property name="bot_fin_liftdrag_upward">
+			<upward>0 -1 0</upward>
+		</xacro:property>
+		<xacro:property name="bot_fin_liftdrag_forward">
+			<forward>1 0 0</forward>
+		</xacro:property>
+		<xacro:property name="bot_fin_liftdrag_cp">
+			<cp>0 0 0</cp>
+		</xacro:property>
+		<xacro:property name="top_fin_liftdrag_upward">
+			<upward>0 1 0</upward>
+		</xacro:property>
+		<xacro:property name="top_fin_liftdrag_forward">
+			<forward>1 0 0</forward>
+		</xacro:property>
+		<xacro:property name="top_fin_liftdrag_cp">
+			<cp>0 0 0</cp>
+		</xacro:property>
+		<xacro:property name="left_fin_liftdrag_upward">
+			<upward>0 1 0</upward> 
+		</xacro:property>
+		<xacro:property name="left_fin_liftdrag_forward">
+			<forward>1 0 0</forward>  
+		</xacro:property>
+		<xacro:property name="left_fin_liftdrag_cp">
+			<cp>0 0 0</cp>
+		</xacro:property>
+		<xacro:property name="right_fin_liftdrag_upward">
+			<upward>0 -1 0</upward> 
+		</xacro:property>
+		<xacro:property name="right_fin_liftdrag_forward">
+			<forward>1 0 0</forward> 
+		</xacro:property>
+		<xacro:property name="right_fin_liftdrag_cp">
+			<cp>0 0 0</cp>
+		</xacro:property>
+		
+		<!-- Rudder properties -->
+		<xacro:property name="bot_rud_liftdrag_upward">
+			<upward>0 -1 0</upward>
+		</xacro:property>
+		<xacro:property name="bot_rud_liftdrag_forward">
+			<forward>1 0 0</forward>
+		</xacro:property>
+		<xacro:property name="bot_rud_liftdrag_cp">
+			<cp>0 0 0</cp>
+		</xacro:property>
+		<xacro:property name="top_rud_liftdrag_upward">
+			<upward>0 1 0</upward>
+		</xacro:property>
+		<xacro:property name="top_rud_liftdrag_forward">
+			<forward>1 0 0</forward>
+		</xacro:property>
+		<xacro:property name="top_rud_liftdrag_cp">
+			<cp>0 0 0</cp>
+		</xacro:property>
+		
+		<!-- Elevator properties -->
+		<xacro:property name="left_elv_liftdrag_upward">
+			<upward>0 1 0</upward> 
+		</xacro:property>
+		<xacro:property name="left_elv_liftdrag_forward">
+			<forward>1 0 0</forward>  
+		</xacro:property>
+		<xacro:property name="left_elv_liftdrag_cp">
+			<cp>0 0 0</cp>
+		</xacro:property>
+		<xacro:property name="right_elv_liftdrag_upward">
+			<upward>0 -1 0</upward> 
+		</xacro:property>
+		<xacro:property name="right_elv_liftdrag_forward">
+			<forward>1 0 0</forward> 
+		</xacro:property>
+		<xacro:property name="right_elv_liftdrag_cp">
+			<cp>0 0 0</cp>
+		</xacro:property>
+
+		<!-- Body aerodynamics - Forward and aft lift surfaces -->
+		<xacro:finliftdrag
+			namespace="${namespace}"
+			link_name="forward_lift_joint_link"
+			air_density="${air_density}"
+			body_lift="true"
+			stall_angle="22"
+			cw0="${(area_body_front/(area_body_lift/2)) * 0.04}"
+			cw1="0.6"
+			cw2="1.2"
+			cl0="0"
+			cl1="1.2"
+			cl2="0"
+			area="${area_body_lift/2}">
+			<xacro:insert_block name="body_lift_liftdrag_upward" />
+			<xacro:insert_block name="body_lift_liftdrag_forward" />
+			<xacro:insert_block name="body_lift_liftdrag_cp" />
+		</xacro:finliftdrag>
+		
+		<xacro:finliftdrag
+			namespace="${namespace}"
+			link_name="aft_lift_joint_link"
+			air_density="${air_density}"
+			body_lift="true"
+			stall_angle="22"
+			cw0="0"
+			cw1="0.6"
+			cw2="1.2"
+			cl0="0"
+			cl1="1.2"
+			cl2="0"
+			area="${area_body_lift/2}">
+			<xacro:insert_block name="body_lift_liftdrag_upward" />
+			<xacro:insert_block name="body_lift_liftdrag_forward" />
+			<xacro:insert_block name="body_lift_liftdrag_cp" />
+		</xacro:finliftdrag>
+
+		<!-- Rudder aerodynamics -->
+		<xacro:finliftdrag
+			namespace="${namespace}"
+			link_name="bot_rud_part1_link"
+			air_density="${air_density}"
+			body_lift="false"
+			stall_angle="22"
+			cw0="${(area_fin_front/area_fin) * 1.2}"
+			cw1="${((area_fin_front/area_fin) * 1.2 + 1.2 ) * 0.5 }"
+			cw2="1.2"
+			cl0="0"
+			cl1="0.6"
+			cl2="0"
+			area="${area_fin}">
+			<xacro:insert_block name="bot_rud_liftdrag_upward" />
+			<xacro:insert_block name="bot_rud_liftdrag_forward" />
+			<xacro:insert_block name="bot_rud_liftdrag_cp" />
+		</xacro:finliftdrag>
+		
+		<xacro:finliftdrag
+			namespace="${namespace}"
+			link_name="top_rud_part1_link"
+			air_density="${air_density}"
+			body_lift="false"
+			stall_angle="22"
+			cw0="${(area_fin_front/area_fin) * 1.2}"
+			cw1="${((area_fin_front/area_fin) * 1.2 + 1.2 ) * 0.5 }"
+			cw2="1.2"
+			cl0="0"
+			cl1="0.6"
+			cl2="0"
+			area="${area_fin}">
+			<xacro:insert_block name="top_rud_liftdrag_upward" />
+			<xacro:insert_block name="top_rud_liftdrag_forward" />
+			<xacro:insert_block name="top_rud_liftdrag_cp" />
+		</xacro:finliftdrag>
+
+		<!-- Elevator aerodynamics -->
+		<xacro:finliftdrag
+			namespace="${namespace}"
+			link_name="left_elv_part1_link"
+			air_density="${air_density}"
+			body_lift="false"
+			stall_angle="22"
+			cw0="${(area_fin_front/area_fin) * 1.2}"
+			cw1="${((area_fin_front/area_fin) * 1.2 + 1.2 ) * 0.5 }"
+			cw2="1.2"
+			cl0="0"
+			cl1="0.6"
+			cl2="0"
+			area="${area_fin}">
+			<xacro:insert_block name="left_elv_liftdrag_upward" />
+			<xacro:insert_block name="left_elv_liftdrag_forward" />
+			<xacro:insert_block name="left_elv_liftdrag_cp" />
+		</xacro:finliftdrag>
+		
+		<xacro:finliftdrag
+			namespace="${namespace}"
+			link_name="right_elv_part1_link"
+			air_density="${air_density}"
+			body_lift="false"
+			stall_angle="22"
+			cw0="${(area_fin_front/area_fin) * 1.2}"
+			cw1="${((area_fin_front/area_fin) * 1.2 + 1.2 ) * 0.5 }"
+			cw2="1.2"
+			cl0="0"
+			cl1="0.6"
+			cl2="0"
+			area="${area_fin}">
+			<xacro:insert_block name="right_elv_liftdrag_upward" />
+			<xacro:insert_block name="right_elv_liftdrag_forward" />
+			<xacro:insert_block name="right_elv_liftdrag_cp" />
+		</xacro:finliftdrag>
+
+		<!-- Fin aerodynamics -->
+		<xacro:finliftdrag
+			namespace="${namespace}"
+			link_name="bot_fin_link"
+			air_density="${air_density}"
+			body_lift="false"
+			stall_angle="22"
+			cw0="${(area_fin_front/area_fin) * 1.2}"
+			cw1="${((area_fin_front/area_fin) * 1.2 + 1.2 ) * 0.5 }"
+			cw2="1.2"
+			cl0="0"
+			cl1="0.6"
+			cl2="0"
+			area="${area_fin}">
+			<xacro:insert_block name="bot_fin_liftdrag_upward" />
+			<xacro:insert_block name="bot_fin_liftdrag_forward" />
+			<xacro:insert_block name="bot_fin_liftdrag_cp" />
+		</xacro:finliftdrag>
+		
+		<xacro:finliftdrag
+			namespace="${namespace}"
+			link_name="top_fin_link"
+			air_density="${air_density}"
+			body_lift="false"
+			stall_angle="22"
+			cw0="${(area_fin_front/area_fin) * 1.2}"
+			cw1="${((area_fin_front/area_fin) * 1.2 + 1.2 ) * 0.5 }"
+			cw2="1.2"
+			cl0="0"
+			cl1="0.6"
+			cl2="0"
+			area="${area_fin}">
+			<xacro:insert_block name="top_fin_liftdrag_upward" />
+			<xacro:insert_block name="top_fin_liftdrag_forward" />
+			<xacro:insert_block name="top_fin_liftdrag_cp" />
+		</xacro:finliftdrag>
+		
+		<xacro:finliftdrag
+			namespace="${namespace}"
+			link_name="left_fin_link"
+			air_density="${air_density}"
+			body_lift="false"
+			stall_angle="22"
+			cw0="${(area_fin_front/area_fin) * 1.2}"
+			cw1="${((area_fin_front/area_fin) * 1.2 + 1.2 ) * 0.5 }"
+			cw2="1.2"
+			cl0="0"
+			cl1="0.6"
+			cl2="0"
+			area="${area_fin}">
+			<xacro:insert_block name="left_fin_liftdrag_upward" />
+			<xacro:insert_block name="left_fin_liftdrag_forward" />
+			<xacro:insert_block name="left_fin_liftdrag_cp" />
+		</xacro:finliftdrag>
+		
+		<xacro:finliftdrag
+			namespace="${namespace}"
+			link_name="right_fin_link"
+			air_density="${air_density}"
+			body_lift="false"
+			stall_angle="22"
+			cw0="${(area_fin_front/area_fin) * 1.2}"
+			cw1="${((area_fin_front/area_fin) * 1.2 + 1.2 ) * 0.5 }"
+			cw2="1.2"
+			cl0="0"
+			cl1="0.6"
+			cl2="0"
+			area="${area_fin}">
+			<xacro:insert_block name="right_fin_liftdrag_upward" />
+			<xacro:insert_block name="right_fin_liftdrag_forward" />
+			<xacro:insert_block name="right_fin_liftdrag_cp" />
+		</xacro:finliftdrag>
+
+	</xacro:if>
+
+	<!-- Buoyancy Plugin - Main body buoyancy -->
+	<xacro:buoyancy
+		volume="${volume_total}"
+		fluid_density="${air_density}">
+	</xacro:buoyancy>
+
+	<!-- Dynamic Volume Plugin - For helium volume changes -->
+	<xacro:dynamic_volume
+		namespace="${namespace}"
+		linkname="blimp_body_link"
+		dynamicvolumetopic="dynamic_volume"
+		heliummasstopic="helium_mass"
+		heliummass="${helium_mass}"
+		reference_altitude="0">
+	</xacro:dynamic_volume>
+
+	<!-- Motor Plugins - Replacing rotors_simulator with Gazebo Harmonic built-in -->
+	<!-- Left blade motor using gz-sim-multicopter-motor-model-system -->
+	<gazebo>
+		<plugin filename="gz-sim-multicopter-motor-model-system" name="left_blade_motor_model">
+			<robotNamespace>${namespace}</robotNamespace>
+			<linkName>left_blade_link</linkName>
+			<jointName>stick_left_blade_joint</jointName>
+			<turningDirection>ccw</turningDirection>
+			<timeConstantUp>${time_constant_up}</timeConstantUp>
+			<timeConstantDown>${time_constant_down}</timeConstantDown>
+			<maxRotVelocity>${max_rot_velocity}</maxRotVelocity>
+			<motorConstant>${motor_constant}</motorConstant>
+			<momentConstant>${moment_constant}</momentConstant>
+			<commandSubTopic>command/motor_speed</commandSubTopic>
+			<motorNumber>0</motorNumber>
+			<rotorDragCoefficient>${rotor_drag_coefficient}</rotorDragCoefficient>
+			<rollingMomentCoefficient>${rolling_moment_coefficient}</rollingMomentCoefficient>
+			<motorSpeedPubTopic>motor_speed/0</motorSpeedPubTopic>
+		</plugin>
+	</gazebo>
+
+	<!-- Right blade motor -->
+	<gazebo>
+		<plugin filename="gz-sim-multicopter-motor-model-system" name="right_blade_motor_model">
+			<robotNamespace>${namespace}</robotNamespace>
+			<linkName>right_blade_link</linkName>
+			<jointName>stick_right_blade_joint</jointName>
+			<turningDirection>cw</turningDirection>
+			<timeConstantUp>${time_constant_up}</timeConstantUp>
+			<timeConstantDown>${time_constant_down}</timeConstantDown>
+			<maxRotVelocity>${max_rot_velocity}</maxRotVelocity>
+			<motorConstant>${motor_constant}</motorConstant>
+			<momentConstant>${moment_constant}</momentConstant>
+			<commandSubTopic>command/motor_speed</commandSubTopic>
+			<motorNumber>1</motorNumber>
+			<rotorDragCoefficient>${rotor_drag_coefficient}</rotorDragCoefficient>
+			<rollingMomentCoefficient>${rolling_moment_coefficient}</rollingMomentCoefficient>
+			<motorSpeedPubTopic>motor_speed/1</motorSpeedPubTopic>
+		</plugin>
+	</gazebo>
+
+	<!-- Bottom rudder motor -->
+	<gazebo>
+		<plugin filename="gz-sim-multicopter-motor-model-system" name="bot_rud_motor_model">
+			<robotNamespace>${namespace}</robotNamespace>
+			<linkName>bot_rud_motor_link</linkName>
+			<jointName>bot_rud_part1_bot_rud_motor_joint</jointName>
+			<turningDirection>cw</turningDirection>
+			<timeConstantUp>${time_constant_up}</timeConstantUp>
+			<timeConstantDown>${time_constant_down}</timeConstantDown>
+			<maxRotVelocity>${max_rot_velocity}</maxRotVelocity>
+			<motorConstant>${motor_constant}</motorConstant>
+			<momentConstant>${moment_constant}</momentConstant>
+			<commandSubTopic>command/motor_speed</commandSubTopic>
+			<motorNumber>2</motorNumber>
+			<rotorDragCoefficient>${rotor_drag_coefficient}</rotorDragCoefficient>
+			<rollingMomentCoefficient>${rolling_moment_coefficient}</rollingMomentCoefficient>
+			<motorSpeedPubTopic>motor_speed/2</motorSpeedPubTopic>
+		</plugin>
+	</gazebo>
+
+	<!-- Sensor Plugins - Replacing rotors_simulator sensors with Gazebo Harmonic built-in -->
+	<!-- IMU sensor using gz-sim-imu-system -->
+	<gazebo reference="imu_link">
+		<sensor type="imu" name="${namespace}_imu">
+			<pose>0 0 0 0 0 0</pose>
+			<topic>${namespace}/imu</topic>
+			<update_rate>1000</update_rate>
+			<imu>
+				<angular_velocity>
+					<x>
+						<noise type="gaussian">
+							<mean>0.0</mean>
+							<stddev>${gyroscope_noise_density}</stddev>
+							<bias_mean>0.0</bias_mean>
+							<bias_stddev>${gyroscope_turn_on_bias_sigma}</bias_stddev>
+						</noise>
+					</x>
+					<y>
+						<noise type="gaussian">
+							<mean>0.0</mean>
+							<stddev>${gyroscope_noise_density}</stddev>
+							<bias_mean>0.0</bias_mean>
+							<bias_stddev>${gyroscope_turn_on_bias_sigma}</bias_stddev>
+						</noise>
+					</y>
+					<z>
+						<noise type="gaussian">
+							<mean>0.0</mean>
+							<stddev>${gyroscope_noise_density}</stddev>
+							<bias_mean>0.0</bias_mean>
+							<bias_stddev>${gyroscope_turn_on_bias_sigma}</bias_stddev>
+						</noise>
+					</z>
+				</angular_velocity>
+				<linear_acceleration>
+					<x>
+						<noise type="gaussian">
+							<mean>0.0</mean>
+							<stddev>${accelerometer_noise_density}</stddev>
+							<bias_mean>0.0</bias_mean>
+							<bias_stddev>${accelerometer_turn_on_bias_sigma}</bias_stddev>
+						</noise>
+					</x>
+					<y>
+						<noise type="gaussian">
+							<mean>0.0</mean>
+							<stddev>${accelerometer_noise_density}</stddev>
+							<bias_mean>0.0</bias_mean>
+							<bias_stddev>${accelerometer_turn_on_bias_sigma}</bias_stddev>
+						</noise>
+					</y>
+					<z>
+						<noise type="gaussian">
+							<mean>0.0</mean>
+							<stddev>${accelerometer_noise_density}</stddev>
+							<bias_mean>0.0</bias_mean>
+							<bias_stddev>${accelerometer_turn_on_bias_sigma}</bias_stddev>
+						</noise>
+					</z>
+				</linear_acceleration>
+			</imu>
+			<plugin filename="gz-sim-imu-system" name="imu_system"/>
+		</sensor>
+	</gazebo>
+
+	<!-- GPS sensor using gz-sim-navsat-system -->
+	<gazebo reference="gps_link">
+		<sensor type="navsat" name="${namespace}_gps">
+			<pose>0 0 0 0 0 0</pose>
+			<topic>${namespace}/gps</topic>
+			<update_rate>10</update_rate>
+			<navsat>
+				<position_sensing>
+					<horizontal>
+						<noise type="gaussian">
+							<mean>0.0</mean>
+							<stddev>2.0</stddev>
+						</noise>
+					</horizontal>
+					<vertical>
+						<noise type="gaussian">
+							<mean>0.0</mean>
+							<stddev>4.0</stddev>
+						</noise>
+					</vertical>
+				</position_sensing>
+				<velocity_sensing>
+					<horizontal>
+						<noise type="gaussian">
+							<mean>0.0</mean>
+							<stddev>0.1</stddev>
+						</noise>
+					</horizontal>
+					<vertical>
+						<noise type="gaussian">
+							<mean>0.0</mean>
+							<stddev>0.1</stddev>
+						</noise>
+					</vertical>
+				</velocity_sensing>
+			</navsat>
+			<plugin filename="gz-sim-navsat-system" name="navsat_system"/>
+		</sensor>
+	</gazebo>
+
+	<!-- Magnetometer sensor using gz-sim-magnetometer-system -->
+	<gazebo reference="magnetometer_link">
+		<sensor type="magnetometer" name="${namespace}_magnetometer">
+			<pose>0 0 0 0 0 0</pose>
+			<topic>${namespace}/magnetic_field</topic>
+			<update_rate>50</update_rate>
+			<magnetometer>
+				<x>
+					<noise type="gaussian">
+						<mean>0.0</mean>
+						<stddev>0.01</stddev>
+					</noise>
+				</x>
+				<y>
+					<noise type="gaussian">
+						<mean>0.0</mean>
+						<stddev>0.01</stddev>
+					</noise>
+				</y>
+				<z>
+					<noise type="gaussian">
+						<mean>0.0</mean>
+						<stddev>0.01</stddev>
+					</noise>
+				</z>
+			</magnetometer>
+			<plugin filename="gz-sim-magnetometer-system" name="magnetometer_system"/>
+		</sensor>
+	</gazebo>
+
+	<!-- Ground Truth Odometry using gz-sim-odometry-publisher-system -->
+	<gazebo>
+		<plugin filename="gz-sim-odometry-publisher-system" name="odometry_publisher">
+			<robotNamespace>${namespace}</robotNamespace>
+			<odom_frame>odom</odom_frame>
+			<robot_base_frame>blimp_body_link</robot_base_frame>
+			<odom_topic>odometry_sensor1/odometry</odom_topic>
+			<odom_publish_frequency>50</odom_publish_frequency>
+		</plugin>
+	</gazebo>
+
+	<!-- ROS2 Control Integration -->
+	<gazebo>
+		<plugin filename="ign_ros2_control-system" name="ign_ros2_control::IgnitionROS2ControlPlugin">
+			<parameters>$(find blimp_description)/config/blimp_controllers.yaml</parameters>
+		</plugin>
+	</gazebo>
+
+	<!-- LibrePilot Integration (Temporary - using ROS1 bridge) -->
+	<!-- NOTE: This will be replaced with PX4 integration in Phase 3 -->
+	<gazebo>
+		<plugin filename="libgazebo_mavlink_interface.so" name="mavlink_interface">
+			<robotNamespace>${namespace}</robotNamespace>
+			<imuSubTopic>/mavros/imu/data</imuSubTopic>
+			<magSubTopic>/mavros/imu/mag</magSubTopic>
+			<baroSubTopic>/mavros/imu/atm_pressure</baroSubTopic>
+			<mavlink_addr>INADDR_ANY</mavlink_addr>
+			<mavlink_tcp_port>4560</mavlink_tcp_port>
+			<mavlink_udp_port>14550</mavlink_udp_port>
+			<serialEnabled>false</serialEnabled>
+			<serialDevice>/dev/ttyACM0</serialDevice>
+			<baudRate>921600</baudRate>
+			<qgc_addr>INADDR_ANY</qgc_addr>
+			<qgc_udp_port>14550</qgc_udp_port>
+			<sdk_addr>INADDR_ANY</sdk_addr>
+			<sdk_udp_port>14540</sdk_udp_port>
+			<hil_mode>false</hil_mode>
+			<hil_state_level>false</hil_state_level>
+			<vehicle_is_tailsitter>false</vehicle_is_tailsitter>
+			<send_vision_estimation>false</send_vision_estimation>
+			<send_odometry>false</send_odometry>
+			<enable_lockstep>true</enable_lockstep>
+			<use_tcp>true</use_tcp>
+		</plugin>
+	</gazebo>
+
+</robot>

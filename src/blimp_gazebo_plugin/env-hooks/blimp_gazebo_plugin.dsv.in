@@ -1,0 +1,2 @@
+prepend-non-duplicate;GAZEBO_PLUGIN_PATH;lib
+prepend-non-duplicate;GZ_SIM_RESOURCE_PATH;share

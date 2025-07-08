@@ -27,7 +27,7 @@ def generate_launch_description():
 
 def launch_robot_nodes(context: LaunchContext, *args, **kwargs):
     try:
-        num_robots = int(context.launch_configurations['num_robots'])
+        num_robots = int(LaunchConfiguration('num_robots').perform(context))
         if num_robots < 1:
             raise ValueError("num_robots must be >= 1")
     except (KeyError, ValueError) as e:
@@ -35,7 +35,7 @@ def launch_robot_nodes(context: LaunchContext, *args, **kwargs):
         num_robots = 1
     
     # Convert string to boolean
-    use_sim_time_str = context.launch_configurations['use_sim_time']
+    use_sim_time_str = LaunchConfiguration('use_sim_time').perform(context)
     use_sim_time = use_sim_time_str.lower() in ['true', '1', 't', 'y', 'yes']
     
     nodes = []
@@ -61,4 +61,4 @@ def launch_robot_nodes(context: LaunchContext, *args, **kwargs):
         
         nodes.append(group)
     
-    return nodes
+    return nodes    
