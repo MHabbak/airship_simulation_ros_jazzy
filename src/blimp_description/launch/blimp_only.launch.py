@@ -5,37 +5,38 @@ from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument, IncludeLaunchDescription, GroupAction
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration, PathJoinSubstitution
+from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node, PushRosNamespace, SetParametersFromFile
 
 def generate_launch_description():
     # Package Directories
-    pkg_blimp = get_package_share_directory('blimp_description')
+    pkg_blimp_description = get_package_share_directory('blimp_description')
     
     # Launch Arguments
     uav_name = LaunchConfiguration('uav_name')
     namespace = LaunchConfiguration('namespace', default=uav_name)
-    rvizconfig = LaunchConfiguration('rvizconfig')
     
-    # Paths
-    rviz_config_file = PathJoinSubstitution([pkg_blimp, 'rviz', 'blimp.rviz'])
+    # Paths - FIXED: Use resource/ not config/
+    controller_config = os.path.join(pkg_blimp_description, 'resource', 'controller_blimp.yaml')
+    blimp_config = os.path.join(pkg_blimp_description, 'resource', 'blimp.yaml')
     
-    # Group for namespaced nodes
+    # Group for namespaced nodes  
     blimp_group = GroupAction([
         PushRosNamespace(namespace),
         
-        # Load parameters 
-        SetParametersFromFile(os.path.join(pkg_blimp, 'config', 'controller_blimp.yaml')),
-        SetParametersFromFile(os.path.join(pkg_blimp, 'config', 'blimp.yaml')),
+        # Load parameters from resource folder
+        SetParametersFromFile(controller_config),
+        SetParametersFromFile(blimp_config),
         
         # Include spawn_uav launch
         IncludeLaunchDescription(
             PythonLaunchDescriptionSource(
-                os.path.join(pkg_blimp, 'launch', 'spawn_uav_launch.py')
+                os.path.join(pkg_blimp_description, 'launch', 'spawn_uav.launch.py')
             ),
             launch_arguments={
                 'uav_name': uav_name,
                 'namespace': namespace,
+                'model': os.path.join(pkg_blimp_description, 'urdf', 'blimp_base.xacro'),
                 'enable_meshes': LaunchConfiguration('enable_meshes'),
                 'enable_wind': LaunchConfiguration('enable_wind'),
                 'enable_physics': LaunchConfiguration('enable_physics'),
@@ -44,18 +45,26 @@ def generate_launch_description():
                 'enable_ground_truth': LaunchConfiguration('enable_ground_truth'),
                 'enable_mavlink_interface': LaunchConfiguration('enable_mavlink_interface'),
                 'is_input_joystick': LaunchConfiguration('is_input_joystick'),
-                'x': LaunchConfiguration('X'),
-                'y': LaunchConfiguration('Y'),
-                'z': LaunchConfiguration('Z'),
+                'X': LaunchConfiguration('X'),
+                'Y': LaunchConfiguration('Y'),
+                'Z': LaunchConfiguration('Z'),
             }.items()
         ),
         
-        # Controller spawner
+        # Controller manager and spawner
+        Node(
+            package='controller_manager',
+            executable='ros2_control_node',
+            name='controller_manager',
+            output='screen',
+            parameters=[controller_config]
+        ),
+        
         Node(
             package='controller_manager',
             executable='spawner',
             arguments=[
-                'revolute_joint_state_controller',
+                'joint_state_broadcaster',
                 'stick_joint_position_controller',
                 'botfin_joint_position_controller',
                 'topfin_joint_position_controller',
@@ -82,51 +91,30 @@ def generate_launch_description():
         ),
     ])
     
-    # RViz node
-    rviz_node = Node(
-        package='rviz2',
-        executable='rviz2',
-        name='rviz',
-        arguments=['-d', rvizconfig],
-        parameters=[{'use_sim_time': True}],
-    )
-    
-    # Blimp control node
-    blimp_ctrl = Node(
-        package='blimp_description',
-        executable='gcs_blimp.py',
-        name='blimp_ctrl',
-        namespace=namespace,
-        output='screen',
-        arguments=[uav_name],  # passes the UAV name directly
-    )
-    
-    # Put everything into the LaunchDescription
-    ld = LaunchDescription()
-
-    # Declare all arguments
-    argument_defaults = [
-        ('uav_name', 'blimp'),
-        ('namespace', ''),
-        ('is_input_joystick', 'false'),
-        ('enable_meshes', 'true'),
-        ('enable_wind', 'true'),
-        ('enable_physics', 'true'),
-        ('enable_sensors', 'true'),
-        ('enable_logging', 'false'),
-        ('enable_ground_truth', 'true'),
-        ('enable_mavlink_interface', 'false'),
-        ('rvizconfig', rviz_config_file.perform(None)),
-        ('X', '0.0'),
-        ('Y', '0.0'),
-        ('Z', '1.0'),
-    ]
-    for name, default in argument_defaults:
-        ld.add_action(DeclareLaunchArgument(name, default_value=default))
-
-    # Launch everything
-    ld.add_action(blimp_group)
-    ld.add_action(rviz_node)
-    ld.add_action(blimp_ctrl)
-
-    return ld
+    return LaunchDescription([
+        # Declare arguments
+        DeclareLaunchArgument('uav_name', default_value='blimp'),
+        DeclareLaunchArgument('roboID', default_value='0'),
+        DeclareLaunchArgument('namespace', default_value='blimp'),
+        DeclareLaunchArgument('is_input_joystick', default_value='false'),
+        DeclareLaunchArgument('enable_meshes', default_value='true'),
+        DeclareLaunchArgument('enable_wind', default_value='true'),
+        DeclareLaunchArgument('enable_physics', default_value='true'),
+        DeclareLaunchArgument('enable_sensors', default_value='true'),
+        DeclareLaunchArgument('enable_logging', default_value='false'),
+        DeclareLaunchArgument('enable_ground_truth', default_value='true'),
+        DeclareLaunchArgument('enable_mavlink_interface', default_value='false'),
+        DeclareLaunchArgument('world_name', default_value='basic'),
+        DeclareLaunchArgument('debug', default_value='false'),
+        DeclareLaunchArgument('gui', default_value='true'),
+        DeclareLaunchArgument('paused', default_value='false'),
+        DeclareLaunchArgument('log_file', default_value='blimp'),
+        DeclareLaunchArgument('wait_to_record_bag', default_value='false'),
+        DeclareLaunchArgument('verbose', default_value='true'),
+        DeclareLaunchArgument('X', default_value='0.0'),
+        DeclareLaunchArgument('Y', default_value='0.0'),
+        DeclareLaunchArgument('Z', default_value='1.0'),
+        
+        # Launch blimp
+        blimp_group,
+    ])

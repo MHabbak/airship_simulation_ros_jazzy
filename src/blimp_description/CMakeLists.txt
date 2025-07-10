@@ -24,13 +24,6 @@ install(DIRECTORY
   DESTINATION share/${PROJECT_NAME}/
 )
 
-# Install config files
-install(DIRECTORY
-  resource
-  config
-  DESTINATION share/${PROJECT_NAME}/
-)
-
 # Install world files
 install(DIRECTORY
   worlds

@@ -38,7 +38,7 @@ def generate_launch_description():
     # Include blimp_only_gcshitl launch
     blimp_gcshitl = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(pkg_blimp_description, 'launch', 'blimp_only_gcshitl_launch.py')
+            os.path.join(pkg_blimp_description, 'launch', 'blimp_only_gcshitl.launch.py')
         ),
         launch_arguments={
             'uav_name': uav_name,

@@ -11,10 +11,10 @@ def generate_launch_description():
     # Package Directories
     pkg_blimp_description = get_package_share_directory('blimp_description')
     
-    # This is essentially a wrapper that calls blimp_gcs_launch with wind enabled
+    # FIXED: Correct filename reference
     blimp_gcs = IncludeLaunchDescription(
         PythonLaunchDescriptionSource(
-            os.path.join(pkg_blimp_description, 'launch', 'blimp_gcs_launch.py')
+            os.path.join(pkg_blimp_description, 'launch', 'blimp_gcs.launch.py')
         ),
         launch_arguments={
             'uav_name': LaunchConfiguration('uav_name'),
@@ -53,7 +53,7 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_logging', default_value='false'),
         DeclareLaunchArgument('enable_ground_truth', default_value='true'),
         DeclareLaunchArgument('enable_mavlink_interface', default_value='false'),
-        DeclareLaunchArgument('world_name', default_value='basic.world'),
+        DeclareLaunchArgument('world_name', default_value='wind.world'),
         DeclareLaunchArgument('debug', default_value='false'),
         DeclareLaunchArgument('gui', default_value='true'),
         DeclareLaunchArgument('paused', default_value='false'),
