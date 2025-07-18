@@ -1,30 +1,32 @@
 <?xml version="1.0" ?>
 <robot name="blimp" xmlns:xacro="http://ros.org/wiki/xacro">
 
-	<!-- Define M_PI for ROS2 xacro compatibility -->
-	<xacro:property name="M_PI" value="3.14159265359" />
-	<xacro:property name="PI" value="3.14159265359" />
+  <!-- Define M_PI for ROS2 xacro compatibility -->
+  <xacro:property name="M_PI" value="3.14159265359" />
+  <xacro:property name="PI" value="3.14159265359" />
 
-	<!--*****************  component description  *****************-->
-	<xacro:include filename="$(find blimp_description)/urdf/plugin_control.xacro" />
-	<xacro:include filename="$(find blimp_description)/urdf/plugin_sensors.xacro" />
-	<xacro:include filename="$(find blimp_description)/urdf/plugin_physics.xacro" />
+  <xacro:arg name="namespace" default="blimp"/>
 
-	<!--*****************  property description  *****************-->
-	<xacro:include filename="$(find blimp_description)/urdf/description_property.xacro"/>
+  <!--*****************  component description  *****************-->
+  <xacro:include filename="$(find blimp_description)/urdf/plugin_control.xacro" />
+  <xacro:include filename="$(find blimp_description)/urdf/plugin_sensors.xacro" />
+  <xacro:include filename="$(find blimp_description)/urdf/plugin_physics.xacro" />
 
-	<!--*****************  mechanics description	 *****************-->
-	<xacro:include filename="$(find blimp_description)/urdf/model_xacro.xacro" />
-	<xacro:include filename="$(find blimp_description)/urdf/description_link.xacro"/>
+  <!--*****************  property description  *****************-->
+  <xacro:include filename="$(find blimp_description)/urdf/description_property.xacro"/>
 
-	<!--*****************  controller description  *****************-->
-	<xacro:include filename="$(find blimp_description)/urdf/description_controller.xacro"/>
+  <!--*****************  mechanics description   *****************-->
+  <xacro:include filename="$(find blimp_description)/urdf/model_xacro.xacro" />
+  <xacro:include filename="$(find blimp_description)/urdf/description_link.xacro"/>
 
-	<!--*****************  sensor description  *****************-->
-	<xacro:include filename="$(find blimp_description)/urdf/description_sensor.xacro"/>
+  <!--*****************  controller description  *****************-->
+  <xacro:include filename="$(find blimp_description)/urdf/description_controller.xacro"/>
 
-	<!--*****************  physics and extra plugins description  *****************-->
-	<xacro:include filename="$(find blimp_description)/urdf/description_plugin.xacro"/>
+  <!--*****************  sensor description  *****************-->
+  <xacro:include filename="$(find blimp_description)/urdf/description_sensor.xacro"/>
 
-	
+  <!--*****************  physics and extra plugins description  *****************-->
+  <xacro:include filename="$(find blimp_description)/urdf/description_plugin.xacro"/>
+
+  
 </robot>

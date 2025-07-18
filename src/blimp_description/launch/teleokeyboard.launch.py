@@ -8,10 +8,10 @@ from launch.substitutions import LaunchConfiguration
 from launch_ros.actions import Node
 
 def generate_launch_description():
-    # Launch Arguments
-    namespace = LaunchConfiguration('namespace', default='')
+    # Launch Arguments (minimal, matching original simplicity)
+    namespace = LaunchConfiguration('namespace')
     
-    # Teleop keyboard node
+    # Teleop keyboard node (matches original ROS1 behavior)
     teleop_node = Node(
         package='blimp_description',
         executable='teleokeyboard.py',
@@ -19,15 +19,13 @@ def generate_launch_description():
         namespace=namespace,
         output='screen',
         prefix='xterm -e',  # Launch in new terminal window for keyboard input
-        remappings=[
-            ('cmd_vel', 'cmd_vel'),  # Can be remapped if needed
-        ]
+        # Original script publishes to 'blimp/teleokeyboardcmd' - no remapping needed by default
     )
     
     return LaunchDescription([
-        # Declare arguments
+        # Declare arguments (keep minimal like original ROS1)
         DeclareLaunchArgument('namespace', default_value='',
-                            description='Namespace for the teleop node'),
+                            description='Optional namespace for the teleop node'),
         
         # Launch node
         teleop_node,

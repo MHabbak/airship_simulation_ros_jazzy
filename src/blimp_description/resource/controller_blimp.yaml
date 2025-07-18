@@ -1,43 +1,64 @@
-# ROS2 Control configuration for blimp - migrated from ros_control
 controller_manager:
   ros__parameters:
     update_rate: 100  # Hz
-    
-    # Joint State Broadcaster (replaces joint_state_controller)
+
     joint_state_broadcaster:
       type: joint_state_broadcaster/JointStateBroadcaster
 
-    # Joint Position Controllers (updated for ROS2 control)
     stick_joint_position_controller:
       type: position_controllers/JointPositionController
-      joint: base_stick_joint
-      pid: {p: 1.0, i: 0.7, d: 0.5}
 
     botfin_joint_position_controller:
       type: position_controllers/JointPositionController
-      joint: bot_rud_part1_bot_rud_joint_link_joint
-      pid: {p: 1.0, i: 0.7, d: 0.5}
 
     topfin_joint_position_controller:
       type: position_controllers/JointPositionController
-      joint: top_rud_part1_top_rud_joint_link_joint
-      pid: {p: 1.0, i: 0.7, d: 0.5}
 
     leftfin_joint_position_controller:
       type: position_controllers/JointPositionController
-      joint: left_elv_part1_left_elv_joint_link_joint
-      pid: {p: 1.0, i: 0.7, d: 0.5}
 
     rightfin_joint_position_controller:
       type: position_controllers/JointPositionController
-      joint: right_elv_part1_right_elv_joint_link_joint
-      pid: {p: 1.0, i: 0.7, d: 0.5}
 
-# Spawner configuration for launch files
-spawn_controllers:
-  - joint_state_broadcaster
-  - stick_joint_position_controller
-  - botfin_joint_position_controller
-  - topfin_joint_position_controller
-  - leftfin_joint_position_controller
-  - rightfin_joint_position_controller
+# Individual controller configurations
+joint_state_broadcaster:
+  ros__parameters:
+    joints:
+      - base_stick_joint
+      - bot_rud_part1_bot_rud_joint_link_joint
+      - top_rud_part1_top_rud_joint_link_joint
+      - left_elv_part1_left_elv_joint_link_joint
+      - right_elv_part1_right_elv_joint_link_joint
+    interfaces:
+      - position
+      - velocity
+
+stick_joint_position_controller:
+  ros__parameters:
+    joints:
+      - base_stick_joint
+    interface_name: position
+
+botfin_joint_position_controller:
+  ros__parameters:
+    joints:
+      - bot_rud_part1_bot_rud_joint_link_joint
+    interface_name: position
+
+topfin_joint_position_controller:
+  ros__parameters:
+    joints:
+      - top_rud_part1_top_rud_joint_link_joint
+    interface_name: position
+
+leftfin_joint_position_controller:
+  ros__parameters:
+    joints:
+      - left_elv_part1_left_elv_joint_link_joint
+    interface_name: position
+
+rightfin_joint_position_controller:
+  ros__parameters:
+    joints:
+      - right_elv_part1_right_elv_joint_link_joint
+    interface_name: position

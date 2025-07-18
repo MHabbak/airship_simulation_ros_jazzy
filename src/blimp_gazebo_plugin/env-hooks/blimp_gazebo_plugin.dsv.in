@@ -1,2 +1,4 @@
-prepend-non-duplicate;GAZEBO_PLUGIN_PATH;lib
-prepend-non-duplicate;GZ_SIM_RESOURCE_PATH;share
+prepend-non-duplicate;GAZEBO_PLUGIN_PATH;lib/blimp_gazebo_plugin
+prepend-non-duplicate;GZ_SIM_SYSTEM_PLUGIN_PATH;lib/blimp_gazebo_plugin  
+prepend-non-duplicate;LD_LIBRARY_PATH;lib/blimp_gazebo_plugin
+prepend-non-duplicate;GZ_SIM_RESOURCE_PATH;share/blimp_gazebo_plugin

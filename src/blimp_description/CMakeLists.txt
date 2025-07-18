@@ -30,7 +30,7 @@ install(DIRECTORY
   DESTINATION share/${PROJECT_NAME}/
 )
 
-# Install meshes if any
+# Install meshes
 install(DIRECTORY
   meshes
   DESTINATION share/${PROJECT_NAME}/
@@ -39,6 +39,12 @@ install(DIRECTORY
 # Install RViz configs
 install(DIRECTORY
   rviz
+  DESTINATION share/${PROJECT_NAME}/
+)
+
+# Install resource files (YAML configs)
+install(DIRECTORY
+  resource
   DESTINATION share/${PROJECT_NAME}/
 )
 

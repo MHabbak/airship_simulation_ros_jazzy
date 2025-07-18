@@ -27,8 +27,12 @@
   <depend>ros_gz_bridge</depend>
   <depend>ros_gz_interfaces</depend>
   <depend>gz_sim_vendor</depend>
+
+  <!-- Blimp Gazebo Plugin -->
+  <depend>blimp_gazebo_plugin</depend>
   
   <!-- Messages and TF -->
+  <depend>msgs</depend>
   <depend>geometry_msgs</depend>
   <depend>std_msgs</depend>
   <depend>std_srvs</depend>
@@ -45,11 +49,7 @@
   
   <!-- MAVLink support (temporary for LibrePilot bridge) -->
   <depend>mavros_msgs</depend>
-  
-  <!-- Custom packages (need migration or ROS2 versions) -->
-  <!-- TODO: Replace with ROS2 equivalents -->
-  <!-- <depend>mav_msgs</depend> --> 
-  <!-- <depend>rotors_comm</depend> -->
+
   
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

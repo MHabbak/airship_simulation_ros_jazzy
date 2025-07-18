@@ -79,18 +79,63 @@ def generate_launch_description():
             output='screen',
         ),
 
-        # Joint state publisher (for debugging)
+        # Robot State Publisher (MISSING - ADDED BACK)
+        Node(
+            package='robot_state_publisher',
+            executable='robot_state_publisher',
+            name='robot_state_publisher',
+            parameters=[{'use_sim_time': True}],
+        ),
+
+        # Joint state publisher 
         Node(
             package='joint_state_publisher',
             executable='joint_state_publisher',
             name='joint_state_publisher',
-            output='screen',
             parameters=[{'use_sim_time': True}],
-            condition=IfCondition(LaunchConfiguration('enable_joint_state_pub'))
+        ),
+
+        # Blimp Control Node (gcs_blimp.py) (MISSING - ADDED BACK)
+        Node(
+            package='blimp_description',
+            executable='gcs_blimp.py',
+            name='blimp_ctrl',
+            output='screen',
+            arguments=[f'/{namespace}'],
+        ),
+
+        # Fake GPS Drift Node (MISSING - ADDED BACK)
+        Node(
+            package='fake_gps_drift',
+            executable='fake_gps_drift_node',
+            name='fake_gps_drift_node',
+            output='screen',
+        ),
+
+        # GCS to ROS Bridge (MISSING - ADDED BACK)
+        Node(
+            package='roshitl',
+            executable='gcs2ros.py',
+            name='gcs2ros',
+            output='screen',
+        ),
+
+        # ROS to GCS Bridge with remapping (MISSING - ADDED BACK)
+        Node(
+            package='roshitl',
+            executable='ros2gcs.py',
+            name='ros2gcs',
+            output='screen',
+            remappings=[
+                ('GCSIMU', 'tail/imu'),
+                ('GCSPOS', 'tail/position'),
+                ('GCSVEL', 'ground_speed'),
+                ('GCSAIRSPEED', 'tail/indicatedAirspeed'),
+            ],
         ),
     ])
 
-    # RViz2
+    # RViz2 (was commented out in original ROS1)
     rviz_node = Node(
         package='rviz2',
         executable='rviz2',
@@ -133,8 +178,7 @@ def generate_launch_description():
         DeclareLaunchArgument('enable_logging', default_value='false'),
         DeclareLaunchArgument('enable_ground_truth', default_value='true'),
         DeclareLaunchArgument('enable_mavlink_interface', default_value='false'),
-        DeclareLaunchArgument('enable_rviz', default_value='true'),
-        DeclareLaunchArgument('enable_joint_state_pub', default_value='false'),
+        DeclareLaunchArgument('enable_rviz', default_value='false'),  # Was commented out in ROS1
         DeclareLaunchArgument('log_file', default_value='blimp'),
         DeclareLaunchArgument('wait_to_record_bag', default_value='false'),
         DeclareLaunchArgument('rvizconfig', 

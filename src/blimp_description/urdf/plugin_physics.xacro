@@ -1,162 +1,162 @@
 <?xml version="1.0" ?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
-	
-	<!-- NOTE: Custom aerodynamics plugins need to be recompiled for Gazebo Harmonic -->
-	<!-- These macros maintain the same interface but may need plugin updates -->
+  
+  <!-- NOTE: Custom aerodynamics plugins need to be recompiled for Gazebo Harmonic -->
+  <!-- These macros maintain the same interface but may need plugin updates -->
 
-	<!-- Macro to add basic lift/drag aerodynamics -->
-	<xacro:macro name="liftdrag"
-		params="namespace link_name air_density area body_lift stall_angle *upward *forward *cp">
-		<gazebo>
-			<plugin name="${link_name}_liftdrag" filename="libLiftDragPlugin.so">
-				<robotNamespace>${namespace}</robotNamespace> 
-				<link_name>${link_name}</link_name>
-				<air_density>${air_density}</air_density>
-				<cla>${3 - 2*body_lift}</cla>
-				<cla_stall>-${3 - 2*body_lift}</cla_stall>
-				<cda>0.5</cda>
-				<cda_stall>0.5</cda_stall>
-				<alpha_stall>${stall_angle * M_PI/180.0}</alpha_stall>
-				<a0>0</a0>
-				<area>${area}</area>
-				<radial_symmetry>${body_lift}</radial_symmetry>
-				<xacro:insert_block name="upward" />
-				<xacro:insert_block name="forward" />
-				<xacro:insert_block name="cp" />
-			</plugin>
-		</gazebo>
-	</xacro:macro>
+  <!-- Macro to add basic lift/drag aerodynamics -->
+  <xacro:macro name="liftdrag"
+    params="namespace link_name air_density area body_lift stall_angle *upward *forward *cp">
+    <gazebo>
+      <plugin name="${link_name}_liftdrag" filename="libLiftDragPlugin.so">
+        <robotNamespace>${namespace}</robotNamespace> 
+        <link_name>${link_name}</link_name>
+        <air_density>${air_density}</air_density>
+        <cla>${3 - 2*body_lift}</cla>
+        <cla_stall>-${3 - 2*body_lift}</cla_stall>
+        <cda>0.5</cda>
+        <cda_stall>0.5</cda_stall>
+        <alpha_stall>${stall_angle * M_PI/180.0}</alpha_stall>
+        <a0>0</a0>
+        <area>${area}</area>
+        <radial_symmetry>${body_lift}</radial_symmetry>
+        <xacro:insert_block name="upward" />
+        <xacro:insert_block name="forward" />
+        <xacro:insert_block name="cp" />
+      </plugin>
+    </gazebo>
+  </xacro:macro>
 
-	<!-- Advanced aerodynamics macro with wind consideration -->
-	<!-- finliftdrag_plugin takes windspeed into consideration whereas LiftDragPlugin only considers vehicle speed -->
-	<xacro:macro name="finliftdrag"
-		params="namespace link_name air_density area body_lift stall_angle cw0 cw1 cw2 cl0 cl1 cl2 enable_airspeed_topic:=false airspeed_topic:=false *upward *forward *cp">
-		<gazebo>
-			<plugin name="${link_name}_finliftdrag" filename="libfinliftdrag_plugin.so">
-				<robotNamespace>${namespace}</robotNamespace> 
-				<link_name>${link_name}</link_name>
-				<air_density>${air_density}</air_density>
-				<!-- Drag coefficients for different flight regimes -->
-				<cw0>${cw0}</cw0>
-				<cw1>${cw1}</cw1>
-				<cw2>${cw2}</cw2>
-				<!-- Lift coefficients for different flight regimes -->
-				<cl0>${cl0}</cl0>
-				<cl1>${cl1}</cl1>
-				<cl2>${cl2}</cl2>
-				<!-- Stall characteristics -->
-				<alpha_stall>${stall_angle * M_PI/180.0}</alpha_stall>
-				<a0>0</a0>
-				<area>${area}</area>
-				<!-- Optional airspeed topic for wind consideration -->
-				<xacro:if value="${enable_airspeed_topic}">
-					<airspeedPubTopic>${airspeed_topic}</airspeedPubTopic>
-				</xacro:if>
-				<radial_symmetry>${body_lift}</radial_symmetry>
-				<xacro:insert_block name="upward" />
-				<xacro:insert_block name="forward" />
-				<xacro:insert_block name="cp" />
-			</plugin>
-		</gazebo>
-	</xacro:macro>
+  <!-- Advanced aerodynamics macro with wind consideration -->
+  <!-- finliftdrag_plugin takes windspeed into consideration whereas LiftDragPlugin only considers vehicle speed -->
+  <xacro:macro name="finliftdrag"
+    params="namespace link_name air_density area body_lift stall_angle cw0 cw1 cw2 cl0 cl1 cl2 enable_airspeed_topic:=false airspeed_topic:=false *upward *forward *cp">
+    <gazebo>
+      <plugin name="${link_name}_finliftdrag" filename="libfinliftdrag_plugin.so">
+        <robotNamespace>${namespace}</robotNamespace> 
+        <link_name>${link_name}</link_name>
+        <air_density>${air_density}</air_density>
+        <!-- Drag coefficients for different flight regimes -->
+        <cw0>${cw0}</cw0>
+        <cw1>${cw1}</cw1>
+        <cw2>${cw2}</cw2>
+        <!-- Lift coefficients for different flight regimes -->
+        <cl0>${cl0}</cl0>
+        <cl1>${cl1}</cl1>
+        <cl2>${cl2}</cl2>
+        <!-- Stall characteristics -->
+        <alpha_stall>${stall_angle * M_PI/180.0}</alpha_stall>
+        <a0>0</a0>
+        <area>${area}</area>
+        <!-- Optional airspeed topic for wind consideration -->
+        <xacro:if value="${enable_airspeed_topic}">
+          <airspeedPubTopic>${airspeed_topic}</airspeedPubTopic>
+        </xacro:if>
+        <radial_symmetry>${body_lift}</radial_symmetry>
+        <xacro:insert_block name="upward" />
+        <xacro:insert_block name="forward" />
+        <xacro:insert_block name="cp" />
+      </plugin>
+    </gazebo>
+  </xacro:macro>
 
-	<!-- Macro to add basic buoyancy forces -->
-	<xacro:macro name="buoyancy" 
-		params="volume fluid_density">
-		<gazebo>
-			<plugin name="BuoyancyPlugin" filename="libBuoyancyPlugin.so">
-				<fluid_density>${fluid_density}</fluid_density>
-				<volume>${volume}</volume>
-			</plugin>
-		</gazebo>
-	</xacro:macro>
+  <!-- Macro to add basic buoyancy forces -->
+  <xacro:macro name="buoyancy" 
+    params="volume fluid_density">
+    <gazebo>
+      <plugin name="BuoyancyPlugin" filename="libBuoyancyPlugin.so">
+        <fluid_density>${fluid_density}</fluid_density>
+        <volume>${volume}</volume>
+      </plugin>
+    </gazebo>
+  </xacro:macro>
 
-	<!-- Macro to add dynamic volume changes with altitude and pressure -->
-	<xacro:macro name="dynamic_volume" 
-		params="namespace linkname dynamicvolumetopic heliummasstopic heliummass reference_altitude">
-		<gazebo>
-			<plugin name="dynamicvolume_plugin" filename="libdynamicvolume_plugin.so">
-				<robotNamespace>${namespace}</robotNamespace> 
-				<linkName>${linkname}</linkName> 
-				<dynamicvolumetopic>${dynamicvolumetopic}</dynamicvolumetopic> 
-				<heliummasstopic>${heliummasstopic}</heliummasstopic> 
-				<heliummass>${heliummass}</heliummass> 
-				<reference_altitude>${reference_altitude}</reference_altitude>
-			</plugin>
-		</gazebo>
-	</xacro:macro>
+  <!-- Macro to add dynamic volume changes with altitude and pressure -->
+  <xacro:macro name="dynamic_volume" 
+    params="namespace linkname dynamicvolumetopic heliummasstopic heliummass reference_altitude">
+    <gazebo>
+      <plugin name="dynamicvolume_plugin" filename="libdynamicvolume_plugin.so">
+        <robotNamespace>${namespace}</robotNamespace> 
+        <linkName>${linkname}</linkName> 
+        <dynamicvolumetopic>${dynamicvolumetopic}</dynamicvolumetopic> 
+        <heliummasstopic>${heliummasstopic}</heliummasstopic> 
+        <heliummass>${heliummass}</heliummass> 
+        <reference_altitude>${reference_altitude}</reference_altitude>
+      </plugin>
+    </gazebo>
+  </xacro:macro>
 
-	<!-- Alternative: Gazebo Harmonic Built-in Wind Effects -->
-	<!-- This can be used instead of custom wind plugin if simpler wind modeling is acceptable -->
-	<xacro:macro name="harmonic_wind_effects"
-		params="namespace link_name wind_speed_x wind_speed_y wind_speed_z">
-		<gazebo>
-			<plugin filename="gz-sim-wind-effects-system" name="wind_effects">
-				<robotNamespace>${namespace}</robotNamespace>
-				<linkName>${link_name}</linkName>
-				<wind_direction>${wind_speed_x} ${wind_speed_y} ${wind_speed_z}</wind_direction>
-				<wind_speed>1.0</wind_speed>
-				<turbulence>
-					<intensity>0.1</intensity>
-					<length_scale>10.0</length_scale>
-				</turbulence>
-			</plugin>
-		</gazebo>
-	</xacro:macro>
+  <!-- Alternative: Gazebo Harmonic Built-in Wind Effects -->
+  <!-- This can be used instead of custom wind plugin if simpler wind modeling is acceptable -->
+  <xacro:macro name="harmonic_wind_effects"
+    params="namespace link_name wind_speed_x wind_speed_y wind_speed_z">
+    <gazebo>
+      <plugin filename="gz-sim-wind-effects-system" name="wind_effects">
+        <robotNamespace>${namespace}</robotNamespace>
+        <linkName>${link_name}</linkName>
+        <wind_direction>${wind_speed_x} ${wind_speed_y} ${wind_speed_z}</wind_direction>
+        <wind_speed>1.0</wind_speed>
+        <turbulence>
+          <intensity>0.1</intensity>
+          <length_scale>10.0</length_scale>
+        </turbulence>
+      </plugin>
+    </gazebo>
+  </xacro:macro>
 
-	<!-- Enhanced Buoyancy with Gazebo Harmonic improvements -->
-	<!-- This can be used as an alternative to the custom buoyancy plugin -->
-	<xacro:macro name="harmonic_buoyancy"
-		params="namespace link_name fluid_density volume">
-		<gazebo>
-			<plugin filename="gz-sim-hydrodynamics-system" name="hydrodynamics">
-				<robotNamespace>${namespace}</robotNamespace>
-				<link_name>${link_name}</link_name>
-				<!-- Simplified buoyancy configuration for air -->
-				<fluid_density>${fluid_density}</fluid_density>
-				<volume>${volume}</volume>
-				<!-- Air medium properties -->
-				<drag_coefficient>0.5</drag_coefficient>
-				<added_mass_coefficient>0.1</added_mass_coefficient>
-			</plugin>
-		</gazebo>
-	</xacro:macro>
+  <!-- Enhanced Buoyancy with Gazebo Harmonic improvements -->
+  <!-- This can be used as an alternative to the custom buoyancy plugin -->
+  <xacro:macro name="harmonic_buoyancy"
+    params="namespace link_name fluid_density volume">
+    <gazebo>
+      <plugin filename="gz-sim-hydrodynamics-system" name="hydrodynamics">
+        <robotNamespace>${namespace}</robotNamespace>
+        <link_name>${link_name}</link_name>
+        <!-- Simplified buoyancy configuration for air -->
+        <fluid_density>${fluid_density}</fluid_density>
+        <volume>${volume}</volume>
+        <!-- Air medium properties -->
+        <drag_coefficient>0.5</drag_coefficient>
+        <added_mass_coefficient>0.1</added_mass_coefficient>
+      </plugin>
+    </gazebo>
+  </xacro:macro>
 
-	<!-- Fixed Wing Dynamics (maintained for compatibility) -->
-	<!-- NOTE: This uses rotors_simulator and should be migrated to Gazebo Harmonic -->
-	<xacro:macro name="fw_dynamics"
-		params="robot_namespace link_name aero_params_yaml vehicle_params_yaml isInputJoystick">
-		<gazebo>
-			<!-- DEPRECATED: Replace with Gazebo Harmonic aerodynamics -->
-			<plugin name="${link_name}_fw_dynamics_plugin" filename="librotors_gazebo_fw_dynamics_plugin.so">
-				<robotNamespace>${robot_namespace}</robotNamespace>
-				<linkName>${link_name}</linkName>
-				<aeroParamsYAML>${aero_params_yaml}</aeroParamsYAML>
-				<vehicleParamsYAML>${vehicle_params_yaml}</vehicleParamsYAML>
-				<isInputJoystick>${isInputJoystick}</isInputJoystick>
-			</plugin>
-		</gazebo>
-	</xacro:macro>
+  <!-- Fixed Wing Dynamics (maintained for compatibility) -->
+  <!-- NOTE: This uses rotors_simulator and should be migrated to Gazebo Harmonic -->
+  <xacro:macro name="fw_dynamics"
+    params="robot_namespace link_name aero_params_yaml vehicle_params_yaml isInputJoystick">
+    <gazebo>
+      <!-- DEPRECATED: Replace with Gazebo Harmonic aerodynamics -->
+      <plugin name="${link_name}_fw_dynamics_plugin" filename="librotors_gazebo_fw_dynamics_plugin.so">
+        <robotNamespace>${robot_namespace}</robotNamespace>
+        <linkName>${link_name}</linkName>
+        <aeroParamsYAML>${aero_params_yaml}</aeroParamsYAML>
+        <vehicleParamsYAML>${vehicle_params_yaml}</vehicleParamsYAML>
+        <isInputJoystick>${isInputJoystick}</isInputJoystick>
+      </plugin>
+    </gazebo>
+  </xacro:macro>
 
-	<!-- Modern Alternative: Gazebo Harmonic Lifting Surface -->
-	<xacro:macro name="harmonic_lifting_surface"
-		params="namespace link_name lift_coefficient drag_coefficient area chord_length aspect_ratio">
-		<gazebo>
-			<plugin filename="gz-sim-lifting-surface-system" name="lifting_surface">
-				<robotNamespace>${namespace}</robotNamespace>
-				<link_name>${link_name}</link_name>
-				<!-- Aerodynamic properties -->
-				<lift_coefficient>${lift_coefficient}</lift_coefficient>
-				<drag_coefficient>${drag_coefficient}</drag_coefficient>
-				<area>${area}</area>
-				<!-- Wing geometry -->
-				<chord_length>${chord_length}</chord_length>
-				<aspect_ratio>${aspect_ratio}</aspect_ratio>
-				<!-- Control surface properties -->
-				<control_input_topic>control/surface_deflection</control_input_topic>
-				<max_deflection>30</max_deflection>
-			</plugin>
-		</gazebo>
-	</xacro:macro>
+  <!-- Modern Alternative: Gazebo Harmonic Lifting Surface -->
+  <xacro:macro name="harmonic_lifting_surface"
+    params="namespace link_name lift_coefficient drag_coefficient area chord_length aspect_ratio">
+    <gazebo>
+      <plugin filename="gz-sim-lifting-surface-system" name="lifting_surface">
+        <robotNamespace>${namespace}</robotNamespace>
+        <link_name>${link_name}</link_name>
+        <!-- Aerodynamic properties -->
+        <lift_coefficient>${lift_coefficient}</lift_coefficient>
+        <drag_coefficient>${drag_coefficient}</drag_coefficient>
+        <area>${area}</area>
+        <!-- Wing geometry -->
+        <chord_length>${chord_length}</chord_length>
+        <aspect_ratio>${aspect_ratio}</aspect_ratio>
+        <!-- Control surface properties -->
+        <control_input_topic>control/surface_deflection</control_input_topic>
+        <max_deflection>30</max_deflection>
+      </plugin>
+    </gazebo>
+  </xacro:macro>
 
 </robot>

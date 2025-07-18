@@ -17,6 +17,7 @@ def generate_launch_description():
     uav_name = LaunchConfiguration('uav_name')
     namespace = LaunchConfiguration('namespace', default=uav_name)
     world_name = LaunchConfiguration('world_name')
+    rvizconfig = LaunchConfiguration('rvizconfig')
     
     # Paths - FIXED: Use resource/ not config/
     world_file = PathJoinSubstitution([pkg_blimp_description, 'worlds', world_name])
@@ -58,6 +59,8 @@ def generate_launch_description():
                 'enable_logging': LaunchConfiguration('enable_logging'),
                 'enable_ground_truth': LaunchConfiguration('enable_ground_truth'),
                 'enable_mavlink_interface': LaunchConfiguration('enable_mavlink_interface'),
+                'log_file': LaunchConfiguration('log_file'),
+                'wait_to_record_bag': LaunchConfiguration('wait_to_record_bag'),
                 'X': LaunchConfiguration('X'),
                 'Y': LaunchConfiguration('Y'),
                 'Z': LaunchConfiguration('Z'),
@@ -84,6 +87,40 @@ def generate_launch_description():
                 'leftfin_joint_position_controller',
                 'rightfin_joint_position_controller',
             ],
+            output='screen',
+        ),
+
+        # Robot State Publisher (MISSING - ADDED BACK)
+        Node(
+            package='robot_state_publisher',
+            executable='robot_state_publisher',
+            name='robot_state_publisher',
+            parameters=[{'use_sim_time': True}],
+        ),
+
+        # Joint State Publisher (MISSING - ADDED BACK)
+        Node(
+            package='joint_state_publisher',
+            executable='joint_state_publisher',
+            name='joint_state_publisher',
+            parameters=[{'use_sim_time': True}],
+        ),
+
+        # RViz2 (MISSING - ADDED BACK, was enabled in original ROS1)
+        Node(
+            package='rviz2',
+            executable='rviz2',
+            name='rviz2',
+            output='screen',
+            arguments=['-d', rvizconfig],
+            parameters=[{'use_sim_time': True}],
+        ),
+
+        # Blimp Environment Node (MISSING - ADDED BACK - KEY DIFFERENCE!)
+        Node(
+            package='blimp_description',
+            executable='blimp_env.py',
+            name='blimp_env',
             output='screen',
         ),
     ])
@@ -124,6 +161,8 @@ def generate_launch_description():
         DeclareLaunchArgument('log_file', default_value='blimp'),
         DeclareLaunchArgument('wait_to_record_bag', default_value='false'),
         DeclareLaunchArgument('verbose', default_value='true'),
+        DeclareLaunchArgument('rvizconfig', 
+            default_value=os.path.join(pkg_blimp_description, 'rviz', 'blimp.rviz')),
         DeclareLaunchArgument('X', default_value='0.0'),
         DeclareLaunchArgument('Y', default_value='0.0'),
         DeclareLaunchArgument('Z', default_value='1.0'),
