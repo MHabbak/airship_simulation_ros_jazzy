@@ -11,6 +11,9 @@ find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(robot_state_publisher REQUIRED)
 find_package(xacro REQUIRED)
+# ADDED: Additional dependencies that might be needed for URDF processing
+find_package(urdf REQUIRED)
+find_package(urdf_parser_plugin REQUIRED)
 
 # Install launch files
 install(DIRECTORY
@@ -46,6 +49,13 @@ install(DIRECTORY
 install(DIRECTORY
   resource
   DESTINATION share/${PROJECT_NAME}/
+)
+
+# ADDED: Install script directory if it exists (mirrors ROS1 structure)
+install(DIRECTORY
+  script
+  DESTINATION share/${PROJECT_NAME}/
+  OPTIONAL
 )
 
 if(BUILD_TESTING)

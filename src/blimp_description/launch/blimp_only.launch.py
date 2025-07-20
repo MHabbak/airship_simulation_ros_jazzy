@@ -10,13 +10,23 @@ from launch.actions import (
 from launch.conditions import IfCondition
 from launch.event_handlers import OnProcessExit, OnProcessStart
 from launch.launch_description_sources import PythonLaunchDescriptionSource
-from launch.substitutions import LaunchConfiguration, PathJoinSubstitution, Command
+from launch.substitutions import LaunchConfiguration, PathJoinSubstitution, Command, EnvironmentVariable
 from launch_ros.actions import Node, PushRosNamespace
 from launch_ros.parameter_descriptions import ParameterValue
 
 def generate_launch_description():
     # Package Directories
     pkg_blimp_description = get_package_share_directory('blimp_description')
+    
+    # ADDED: Set up Gazebo resource paths for mesh loading
+    gazebo_resource_path = SetEnvironmentVariable(
+        name='GZ_SIM_RESOURCE_PATH',
+        value=[
+            EnvironmentVariable('GZ_SIM_RESOURCE_PATH', default_value=''),
+            ':' if EnvironmentVariable('GZ_SIM_RESOURCE_PATH', default_value='') else '',
+            pkg_blimp_description
+        ]
+    )
         
     # Launch Arguments
     uav_name = LaunchConfiguration('uav_name')
@@ -111,6 +121,9 @@ def generate_launch_description():
     ])
     
     return LaunchDescription([
+        # ADDED: Set Gazebo resource path first
+        gazebo_resource_path,
+        
         # Declare arguments (same as ROS1 version)
         DeclareLaunchArgument('uav_name', default_value='blimp'),
         DeclareLaunchArgument('roboID', default_value='0'),

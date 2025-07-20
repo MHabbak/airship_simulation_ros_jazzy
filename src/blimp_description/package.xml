@@ -17,7 +17,7 @@
   <depend>joint_state_publisher_gui</depend>
   <depend>xacro</depend>
   
-  <!-- ROS2 Control -->
+  <!-- ROS2 Control (only if using physics) -->
   <depend>ros2_control</depend>
   <depend>ros2_controllers</depend>
   <depend>controller_manager</depend>
@@ -27,8 +27,7 @@
   <depend>ros_gz_sim</depend>
   <depend>ros_gz_bridge</depend>
   <depend>ros_gz_interfaces</depend>
-  <depend>gz_sim_vendor</depend>
-
+  
   <!-- Blimp Gazebo Plugin -->
   <depend>blimp_gazebo_plugin</depend>
   
@@ -53,7 +52,10 @@
   <depend>rviz_common</depend>
   <depend>rviz_default_plugins</depend>
   
-  <!-- MAVLink support (temporary for LibrePilot bridge) -->
+  <!-- GPS Drift Simulation -->
+  <depend>fake_gps_drift</depend>
+  
+  <!-- TEMPORARY: MAVLink support for LibrePilot bridge (remove after migration) -->
   <depend>mavros_msgs</depend>
   
   <test_depend>ament_lint_auto</test_depend>

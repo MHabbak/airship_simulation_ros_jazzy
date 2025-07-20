@@ -21,7 +21,7 @@ find_package(gz_plugin_vendor REQUIRED)
 find_package(gz_common_vendor REQUIRED)
 find_package(gz_sim_vendor REQUIRED)
 
-# Find the actual Gazebo libraries
+# REVERT: Try original versions that might be correct for your system
 find_package(gz-math7 REQUIRED)
 find_package(gz-msgs10 REQUIRED)
 find_package(gz-transport13 REQUIRED)

@@ -4,19 +4,19 @@
   <xacro:property name="namespace" value="$(arg uav_name)" />
   <xacro:property name="air_density" value="1.2041"/> <!--[kg/m^3] Temperature 20celsius: 1.2041-->
 
-  <!-- meshes -->
+  <!-- meshes - FIXED: Use file:// paths for Gazebo Harmonic compatibility -->
   <xacro:property name="use_mesh_file" value="$(arg enable_meshes)" />
-    <xacro:property name="mesh_file_blimp_body" value="package://blimp_description/meshes/blimp_body/blimp_body_v4.dae" />
-  <xacro:property name="mesh_file_blimp_support" value="package://blimp_description/meshes/blimp_support/blimp_support_v5.dae" />
-  <xacro:property name="mesh_file_blimp_gondola" value="package://blimp_description/meshes/blimp_gondola/blimp_gondola_v4.dae" />
-  <xacro:property name="mesh_file_blimp_wing" value="package://blimp_description/meshes/blimp_wing/blimp_wing_v2.dae" />
-  <xacro:property name="mesh_file_blimp_stick" value="package://blimp_description/meshes/blimp_wing/blimp_stick_v2.dae" />
-  <xacro:property name="mesh_file_propeller_cw" value="package://blimp_description/meshes/blimp_propeller/blimp_right_propeller_cw_v3.dae" />
-  <xacro:property name="mesh_file_propeller_ccw" value="package://blimp_description/meshes/blimp_propeller/blimp_left_propeller_ccw_v3.dae" />
-  <xacro:property name="mesh_file_bot_propeller_cw" value="package://blimp_description/meshes/blimp_propeller/blimp_bot_propeller_cw_v3.dae" />
-  <xacro:property name="mesh_file_blimp_rud_part1" value="package://blimp_description/meshes/blimp_fin/blimp_top_rud_part1_v3.dae" />
-  <xacro:property name="mesh_file_blimp_rud_part2" value="package://blimp_description/meshes/blimp_fin/blimp_top_rud_part2_v5.dae" />
-  <xacro:property name="mesh_file_blimp_bot_rud_part1" value="package://blimp_description/meshes/blimp_fin/blimp_bot_rud_part1_v3.dae" />
+  <xacro:property name="mesh_file_blimp_body" value="file://$(find blimp_description)/meshes/blimp_body/blimp_body_v4.dae" />
+  <xacro:property name="mesh_file_blimp_support" value="file://$(find blimp_description)/meshes/blimp_support/blimp_support_v5.dae" />
+  <xacro:property name="mesh_file_blimp_gondola" value="file://$(find blimp_description)/meshes/blimp_gondola/blimp_gondola_v4.dae" />
+  <xacro:property name="mesh_file_blimp_wing" value="file://$(find blimp_description)/meshes/blimp_wing/blimp_wing_v2.dae" />
+  <xacro:property name="mesh_file_blimp_stick" value="file://$(find blimp_description)/meshes/blimp_wing/blimp_stick_v2.dae" />
+  <xacro:property name="mesh_file_propeller_cw" value="file://$(find blimp_description)/meshes/blimp_propeller/blimp_right_propeller_cw_v3.dae" />
+  <xacro:property name="mesh_file_propeller_ccw" value="file://$(find blimp_description)/meshes/blimp_propeller/blimp_left_propeller_ccw_v3.dae" />
+  <xacro:property name="mesh_file_bot_propeller_cw" value="file://$(find blimp_description)/meshes/blimp_propeller/blimp_bot_propeller_cw_v3.dae" />
+  <xacro:property name="mesh_file_blimp_rud_part1" value="file://$(find blimp_description)/meshes/blimp_fin/blimp_top_rud_part1_v3.dae" />
+  <xacro:property name="mesh_file_blimp_rud_part2" value="file://$(find blimp_description)/meshes/blimp_fin/blimp_top_rud_part2_v5.dae" />
+  <xacro:property name="mesh_file_blimp_bot_rud_part1" value="file://$(find blimp_description)/meshes/blimp_fin/blimp_bot_rud_part1_v3.dae" />
 
   <!-- Volume and gas properties -->
   <xacro:property name="volume_total" value="${volume_blimp_body}" />

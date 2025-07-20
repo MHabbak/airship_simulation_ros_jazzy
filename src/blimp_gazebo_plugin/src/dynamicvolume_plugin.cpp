@@ -1,4 +1,4 @@
-// dynamicvolume_plugin.cpp - Implementation (Fixed const-correctness)
+// dynamicvolume_plugin.cpp - Implementation (Enhanced with safety checks)
 #include "dynamicvolume_plugin.hpp"
 
 #include <gz/sim/components/Link.hh>
@@ -58,6 +58,9 @@ class DynamicVolumePlugin::Implementation
   /// \brief Gravity vector
   public: gz::math::Vector3d gravity{0, 0, -9.81};
 
+  /// \brief Plugin initialized flag
+  public: bool initialized{false};
+
   /// \brief Helium mass callback
   public: void HeliumMassCallback(const gz::msgs::Float &_msg);
 
@@ -90,12 +93,24 @@ void DynamicVolumePlugin::Configure(const gz::sim::Entity &_entity,
   this->impl->modelEntity = _entity;
   this->impl->modelName = gz::sim::scopedName(_entity, _ecm);
 
+  // Validate entity
+  if (_entity == gz::sim::kNullEntity)
+  {
+    gzerr << "DynamicVolumePlugin: Invalid entity provided during configuration" << std::endl;
+    return;
+  }
+
   // Get parameters from SDF
   if (_sdf->HasElement("robotNamespace"))
     this->impl->ns = _sdf->Get<std::string>("robotNamespace");
 
   if (_sdf->HasElement("linkName"))
     this->impl->linkName = _sdf->Get<std::string>("linkName");
+  else
+  {
+    gzerr << "DynamicVolumePlugin: linkName parameter is required" << std::endl;
+    return;
+  }
 
   if (_sdf->HasElement("frameId"))
     this->impl->frameId = _sdf->Get<std::string>("frameId");
@@ -111,13 +126,27 @@ void DynamicVolumePlugin::Configure(const gz::sim::Entity &_entity,
     this->impl->heliumMassTopic = "helium_mass";
 
   if (_sdf->HasElement("fluidDensity"))
+  {
     this->impl->fluidDensity = _sdf->Get<double>("fluidDensity");
+    if (this->impl->fluidDensity <= 0.0)
+    {
+      gzwarn << "DynamicVolumePlugin: fluidDensity should be positive. Using default value." << std::endl;
+      this->impl->fluidDensity = 1000.0;
+    }
+  }
 
   if (_sdf->HasElement("refAlt"))
     this->impl->refAlt = _sdf->Get<double>("refAlt");
 
   if (_sdf->HasElement("heliumMassKG"))
+  {
     this->impl->heliumMassKG = _sdf->Get<double>("heliumMassKG");
+    if (this->impl->heliumMassKG <= 0.0)
+    {
+      gzwarn << "DynamicVolumePlugin: heliumMassKG should be positive. Using default value." << std::endl;
+      this->impl->heliumMassKG = 1.0;
+    }
+  }
 
   // Find the link entity
   gz::sim::Entity linkEntity = gz::sim::Model(_entity).LinkByName(_ecm, this->impl->linkName);
@@ -129,6 +158,7 @@ void DynamicVolumePlugin::Configure(const gz::sim::Entity &_entity,
   {
     gzerr << "Link with name[" << this->impl->linkName << "] not found. "
           << "The DynamicVolumePlugin will not generate forces" << std::endl;
+    return;
   }
 
   // Process volume properties from SDF - FIXED const-correctness
@@ -161,6 +191,12 @@ void DynamicVolumePlugin::Configure(const gz::sim::Entity &_entity,
           if (linkElem->HasElement("volume"))
           {
             props.volume = linkElem->Get<double>("volume");
+            if (props.volume <= 0.0)
+            {
+              gzwarn << "DynamicVolumePlugin: Volume for link[" << linkName 
+                     << "] should be positive. Using calculated value." << std::endl;
+              props.volume = this->impl->CalculateVolume(linkEntity, _ecm);
+            }
           }
           else
           {
@@ -168,6 +204,8 @@ void DynamicVolumePlugin::Configure(const gz::sim::Entity &_entity,
           }
 
           this->impl->volumePropsMap[linkEntity] = props;
+          gzdbg << "DynamicVolumePlugin: Configured volume properties for link[" 
+                << linkName << "] volume=" << props.volume << std::endl;
         }
         else
         {
@@ -186,20 +224,37 @@ void DynamicVolumePlugin::Configure(const gz::sim::Entity &_entity,
     props.cov = this->impl->CalculateCenterOfVolume(this->impl->linkEntity, _ecm);
     props.volume = this->impl->CalculateVolume(this->impl->linkEntity, _ecm);
     this->impl->volumePropsMap[this->impl->linkEntity] = props;
+    gzdbg << "DynamicVolumePlugin: Using default volume properties for main link" << std::endl;
   }
 
   // Setup transport
   std::string topic = this->impl->ns + "/" + this->impl->dynamicVolumeTopic;
   this->impl->dynamicVolumePub = this->impl->node.Advertise<gz::msgs::Float>(topic);
+  if (!this->impl->dynamicVolumePub)
+  {
+    gzerr << "DynamicVolumePlugin: Failed to advertise on topic[" << topic << "]" << std::endl;
+    return;
+  }
 
   topic = this->impl->ns + "/" + this->impl->heliumMassTopic;
-  this->impl->node.Subscribe(topic, &DynamicVolumePlugin::Implementation::HeliumMassCallback, this->impl.get());
+  if (!this->impl->node.Subscribe(topic, &DynamicVolumePlugin::Implementation::HeliumMassCallback, this->impl.get()))
+  {
+    gzerr << "DynamicVolumePlugin: Failed to subscribe to topic[" << topic << "]" << std::endl;
+    return;
+  }
+
+  this->impl->initialized = true;
+  gzdbg << "DynamicVolumePlugin: Successfully configured for model[" 
+        << this->impl->modelName << "]" << std::endl;
 }
 
 /////////////////////////////////////////////////
 void DynamicVolumePlugin::PreUpdate(const gz::sim::UpdateInfo &/*_info*/,
                                     gz::sim::EntityComponentManager &_ecm)
 {
+  if (!this->impl->initialized || this->impl->volumePropsMap.empty())
+    return;
+
   // Calculate and apply buoyancy forces for each link
   for (auto &volProps : this->impl->volumePropsMap)
   {
@@ -216,6 +271,10 @@ void DynamicVolumePlugin::PreUpdate(const gz::sim::UpdateInfo &/*_info*/,
     // Calculate dynamic volume based on altitude and helium mass
     double altitude = linkPose.Pos().Z() - this->impl->refAlt;
     double pressureRatio = std::exp(-altitude / 8400.0); // Simplified atmospheric model
+    
+    // Ensure pressureRatio is within reasonable bounds
+    pressureRatio = std::max(0.1, std::min(10.0, pressureRatio));
+    
     double dynamicVolume = props.volume * (1.0 / pressureRatio) * (this->impl->heliumMassKG / 1.0);
 
     // Calculate buoyancy force
@@ -253,7 +312,14 @@ void DynamicVolumePlugin::PreUpdate(const gz::sim::UpdateInfo &/*_info*/,
 /////////////////////////////////////////////////
 void DynamicVolumePlugin::Implementation::HeliumMassCallback(const gz::msgs::Float &_msg)
 {
-  this->heliumMassKG = _msg.data();
+  if (_msg.data() > 0.0)
+  {
+    this->heliumMassKG = _msg.data();
+  }
+  else
+  {
+    gzwarn << "DynamicVolumePlugin: Received invalid helium mass: " << _msg.data() << std::endl;
+  }
 }
 
 /////////////////////////////////////////////////

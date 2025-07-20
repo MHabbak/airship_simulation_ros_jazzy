@@ -13,7 +13,7 @@
       max_rot_velocity motor_number rotor_drag_coefficient
       rolling_moment_coefficient">
     
-    <!-- Gazebo Harmonic Multicopter Motor Model Plugin - COMPLETELY FIXED -->
+    <!-- Gazebo Harmonic Multicopter Motor Model Plugin - FIXED: Correct filename -->
     <gazebo>
       <plugin filename="gz-sim-multicopter-motor-model-system" 
               name="gz::sim::systems::MulticopterMotorModel">
@@ -61,7 +61,7 @@
     </transmission>
   </xacro:macro>
 
-  <!-- ROS2 Control Hardware Interface -->
+  <!-- ROS2 Control Hardware Interface - FIXED: Correct structure -->
   <xacro:macro name="ros2_control_interface" params="namespace">
     <ros2_control name="${namespace}_control" type="system">
       <hardware>
@@ -119,17 +119,6 @@
         <state_interface name="effort"/>
       </joint>
     </ros2_control>
-
-    <!-- Gazebo ROS2 Control Plugin - FIXED -->
-    <gazebo>
-      <plugin filename="gz_ros2_control-system" 
-              name="gz_ros2_control::GazeboSimROS2ControlPlugin">
-        <parameters>$(find blimp_description)/resource/controller_blimp.yaml</parameters>
-        <ros>
-          <namespace>${namespace}</namespace>
-        </ros>
-      </plugin>
-    </gazebo>
   </xacro:macro>
 
   <!-- =============================================================== -->

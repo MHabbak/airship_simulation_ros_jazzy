@@ -6,8 +6,20 @@
   <xacro:property name="PI" value="3.14159265359" />
 
   <xacro:arg name="namespace" default="blimp"/>
-  <!-- ADDED: Missing launch argument that was referenced in launch files -->
+  <xacro:arg name="uav_name" default="blimp"/>
+  
+  <!-- FIXED: Added all missing launch arguments that are referenced in included files -->
   <xacro:arg name="enable_custom_plugins" default="true"/>
+  <xacro:arg name="enable_meshes" default="true"/>
+  <xacro:arg name="enable_wind" default="false"/>
+  <xacro:arg name="enable_physics" default="true"/>
+  <xacro:arg name="enable_sensors" default="true"/>
+  <xacro:arg name="enable_logging" default="false"/>
+  <xacro:arg name="enable_ground_truth" default="true"/>
+  <xacro:arg name="enable_mavlink_interface" default="false"/>
+  <xacro:arg name="log_file" default="blimp"/>
+  <xacro:arg name="wait_to_record_bag" default="false"/>
+  <xacro:arg name="is_input_joystick" default="false"/>
 
   <!--*****************  component description  *****************-->
   <xacro:include filename="$(find blimp_description)/urdf/plugin_control.xacro" />
@@ -30,9 +42,14 @@
   <!--*****************  physics and extra plugins description  *****************-->
   <xacro:include filename="$(find blimp_description)/urdf/description_plugin.xacro"/>
 
-  <!-- ROS 2 Control hardware interface (Gazebo Harmonic) - FIXED -->
+  <!-- ROS 2 Control hardware interface (Gazebo Harmonic) -->
   <gazebo>
-    <plugin name="gz_ros2_control" filename="gz_ros2_control-system"/>
+    <plugin name="gz_ros2_control::GazeboSimROS2ControlPlugin" filename="gz_ros2_control-system">
+      <parameters>$(find blimp_description)/resource/controller_blimp.yaml</parameters>
+      <ros>
+        <namespace>$(arg namespace)</namespace>
+      </ros>
+    </plugin>
   </gazebo>
 
 </robot>

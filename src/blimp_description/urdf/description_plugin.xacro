@@ -98,117 +98,107 @@
   </xacro:if>
 
   <!-- Buoyancy Plugin - Using your migrated dynamicvolume_plugin -->
-  <gazebo>
-    <!-- FIXED: Correct Gazebo Harmonic plugin filename format -->
-    <plugin name="dynamicvolume_plugin" filename="dynamicvolume_plugin">
-      <robotNamespace>${namespace}</robotNamespace> 
-      <linkName>blimp_body_link</linkName> 
-      <dynamicVolumeTopic>dynamic_volume</dynamicVolumeTopic> 
-      <heliumMassTopic>helium_mass</heliumMassTopic> 
-      <heliumMassKG>1.0</heliumMassKG> 
-      <refAlt>0</refAlt>
-      <fluidDensity>1.2041</fluidDensity>
-      <frameId>world</frameId>
-      <!-- Link volume properties -->
-      <link name="blimp_body_link">
-        <volume>10.472</volume>
-        <center_of_volume>0 0 0</center_of_volume>
-      </link>
-    </plugin>
-  </gazebo>
+  <xacro:if value="$(arg enable_custom_plugins)">
+    <gazebo>
+      <!-- FIXED: Correct Gazebo Harmonic plugin filename format -->
+      <plugin name="dynamicvolume_plugin" filename="dynamicvolume_plugin">
+        <robotNamespace>${namespace}</robotNamespace> 
+        <linkName>blimp_body_link</linkName> 
+        <dynamicVolumeTopic>dynamic_volume</dynamicVolumeTopic> 
+        <heliumMassTopic>helium_mass</heliumMassTopic> 
+        <heliumMassKG>1.0</heliumMassKG> 
+        <refAlt>0</refAlt>
+        <fluidDensity>1.2041</fluidDensity>
+        <frameId>world</frameId>
+        <!-- Link volume properties -->
+        <link name="blimp_body_link">
+          <volume>10.472</volume>
+          <center_of_volume>0 0 0</center_of_volume>
+        </link>
+      </plugin>
+    </gazebo>
+  </xacro:if>
 
-  <!-- MOTOR PLUGINS  -->
-  <!-- Left blade motor -->
-  <gazebo>
-    <!-- FIXED: Correct Gazebo Harmonic built-in plugin filename -->
-    <plugin filename="gz-sim-multicopter-motor-model-system" 
-            name="gz::sim::systems::MulticopterMotorModel">
-      <robotNamespace>${namespace}</robotNamespace>
-      <linkName>left_blade_link</linkName>
-      <jointName>stick_left_blade_joint</jointName>
-      <turningDirection>ccw</turningDirection>
-      <timeConstantUp>0.0125</timeConstantUp>
-      <timeConstantDown>0.025</timeConstantDown>
-      <maxRotVelocity>838</maxRotVelocity>
-      <motorConstant>8.54858e-06</motorConstant>
-      <momentConstant>0.016</momentConstant>
-      <commandSubTopic>command/motor_speed</commandSubTopic>
-      <actuator_number>0</actuator_number>
-      <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
-      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
-      <motorSpeedPubTopic>motor_speed/0</motorSpeedPubTopic>
-      <motorType>velocity</motorType>
-      <ros>
-        <namespace>${namespace}</namespace>
-      </ros>
-    </plugin>
-  </gazebo>
+  <!-- MOTOR PLUGINS - FIXED: Conditional inclusion -->
+  <xacro:if value="$(arg enable_physics)">
+    <!-- Left blade motor -->
+    <gazebo>
+      <!-- FIXED: Correct Gazebo Harmonic built-in plugin filename -->
+      <plugin filename="gz-sim-multicopter-motor-model-system" 
+              name="gz::sim::systems::MulticopterMotorModel">
+        <robotNamespace>${namespace}</robotNamespace>
+        <linkName>left_blade_link</linkName>
+        <jointName>stick_left_blade_joint</jointName>
+        <turningDirection>ccw</turningDirection>
+        <timeConstantUp>0.0125</timeConstantUp>
+        <timeConstantDown>0.025</timeConstantDown>
+        <maxRotVelocity>838</maxRotVelocity>
+        <motorConstant>8.54858e-06</motorConstant>
+        <momentConstant>0.016</momentConstant>
+        <commandSubTopic>command/motor_speed</commandSubTopic>
+        <actuator_number>0</actuator_number>
+        <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+        <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+        <motorSpeedPubTopic>motor_speed/0</motorSpeedPubTopic>
+        <motorType>velocity</motorType>
+        <ros>
+          <namespace>${namespace}</namespace>
+        </ros>
+      </plugin>
+    </gazebo>
 
-  <!-- Right blade motor -->
-  <gazebo>
-    <!-- FIXED: Correct Gazebo Harmonic built-in plugin filename -->
-    <plugin filename="gz-sim-multicopter-motor-model-system" 
-            name="gz::sim::systems::MulticopterMotorModel">
-      <robotNamespace>${namespace}</robotNamespace>
-      <linkName>right_blade_link</linkName>
-      <jointName>stick_right_blade_joint</jointName>
-      <turningDirection>cw</turningDirection>
-      <timeConstantUp>0.0125</timeConstantUp>
-      <timeConstantDown>0.025</timeConstantDown>
-      <maxRotVelocity>838</maxRotVelocity>
-      <motorConstant>8.54858e-06</motorConstant>
-      <momentConstant>0.016</momentConstant>
-      <commandSubTopic>command/motor_speed</commandSubTopic>
-      <actuator_number>1</actuator_number>
-      <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
-      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
-      <motorSpeedPubTopic>motor_speed/1</motorSpeedPubTopic>
-      <motorType>velocity</motorType>
-      <ros>
-        <namespace>${namespace}</namespace>
-      </ros>
-    </plugin>
-  </gazebo>
+    <!-- Right blade motor -->
+    <gazebo>
+      <!-- FIXED: Correct Gazebo Harmonic built-in plugin filename -->
+      <plugin filename="gz-sim-multicopter-motor-model-system" 
+              name="gz::sim::systems::MulticopterMotorModel">
+        <robotNamespace>${namespace}</robotNamespace>
+        <linkName>right_blade_link</linkName>
+        <jointName>stick_right_blade_joint</jointName>
+        <turningDirection>cw</turningDirection>
+        <timeConstantUp>0.0125</timeConstantUp>
+        <timeConstantDown>0.025</timeConstantDown>
+        <maxRotVelocity>838</maxRotVelocity>
+        <motorConstant>8.54858e-06</motorConstant>
+        <momentConstant>0.016</momentConstant>
+        <commandSubTopic>command/motor_speed</commandSubTopic>
+        <actuator_number>1</actuator_number>
+        <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+        <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+        <motorSpeedPubTopic>motor_speed/1</motorSpeedPubTopic>
+        <motorType>velocity</motorType>
+        <ros>
+          <namespace>${namespace}</namespace>
+        </ros>
+      </plugin>
+    </gazebo>
 
-  <!-- Bottom rudder motor -->
-  <gazebo>
-    <!-- FIXED: Correct Gazebo Harmonic built-in plugin filename -->
-    <plugin filename="gz-sim-multicopter-motor-model-system" 
-            name="gz::sim::systems::MulticopterMotorModel">
-      <robotNamespace>${namespace}</robotNamespace>
-      <linkName>bot_rud_motor_link</linkName>
-      <jointName>bot_rud_part1_bot_rud_motor_joint</jointName>
-      <turningDirection>cw</turningDirection>
-      <timeConstantUp>0.0125</timeConstantUp>
-      <timeConstantDown>0.025</timeConstantDown>
-      <maxRotVelocity>838</maxRotVelocity>
-      <motorConstant>8.54858e-06</motorConstant>
-      <momentConstant>0.016</momentConstant>
-      <commandSubTopic>command/motor_speed</commandSubTopic>
-      <actuator_number>2</actuator_number>
-      <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
-      <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
-      <motorSpeedPubTopic>motor_speed/2</motorSpeedPubTopic>
-      <motorType>velocity</motorType>
-      <ros>
-        <namespace>${namespace}</namespace>
-      </ros>
-    </plugin>
-  </gazebo>
-
-  <!-- REMOVED: Hardcoded sensor plugins that referenced deleted links -->
-  <!-- The following sensor plugins were removed because they referenced 
-       hardcoded links (imu_link, gps_link, magnetometer_link) that we deleted:
-       
-       - IMU sensor plugin (now handled by sensor plugin macros in description_sensor.xacro)
-       - GPS sensor plugin (now handled by sensor plugin macros in description_sensor.xacro)  
-       - Magnetometer sensor plugin (can be added via sensor macros if needed)
-       
-       These sensors are properly created by the sensor plugin system in:
-       - description_sensor.xacro calls the sensor macros
-       - plugin_sensors.xacro defines the sensor macros
-       - The macros create both the links AND the sensor plugins
-  -->
+    <!-- Bottom rudder motor -->
+    <gazebo>
+      <!-- FIXED: Correct Gazebo Harmonic built-in plugin filename -->
+      <plugin filename="gz-sim-multicopter-motor-model-system" 
+              name="gz::sim::systems::MulticopterMotorModel">
+        <robotNamespace>${namespace}</robotNamespace>
+        <linkName>bot_rud_motor_link</linkName>
+        <jointName>bot_rud_part1_bot_rud_motor_joint</jointName>
+        <turningDirection>cw</turningDirection>
+        <timeConstantUp>0.0125</timeConstantUp>
+        <timeConstantDown>0.025</timeConstantDown>
+        <maxRotVelocity>838</maxRotVelocity>
+        <motorConstant>8.54858e-06</motorConstant>
+        <momentConstant>0.016</momentConstant>
+        <commandSubTopic>command/motor_speed</commandSubTopic>
+        <actuator_number>2</actuator_number>
+        <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
+        <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
+        <motorSpeedPubTopic>motor_speed/2</motorSpeedPubTopic>
+        <motorType>velocity</motorType>
+        <ros>
+          <namespace>${namespace}</namespace>
+        </ros>
+      </plugin>
+    </gazebo>
+  </xacro:if>
 
   <!-- Ground Truth Odometry - This doesn't reference a specific sensor link -->
   <xacro:if value="$(arg enable_ground_truth)">

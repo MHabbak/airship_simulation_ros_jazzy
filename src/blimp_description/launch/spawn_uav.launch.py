@@ -2,9 +2,9 @@
 import os
 from ament_index_python.packages import get_package_share_directory
 from launch import LaunchDescription
-from launch.actions import DeclareLaunchArgument, RegisterEventHandler
+from launch.actions import DeclareLaunchArgument, RegisterEventHandler, TimerAction
 from launch.event_handlers import OnProcessStart
-from launch.substitutions import LaunchConfiguration, Command
+from launch.substitutions import LaunchConfiguration, Command, PathJoinSubstitution
 from launch_ros.actions import Node
 from launch_ros.parameter_descriptions import ParameterValue
 
@@ -69,16 +69,24 @@ def generate_launch_description():
         parameters=[{'use_sim_time': True}],
     )
 
-    # Event handler: spawn entity only after robot_state_publisher starts
+    # SIMPLIFIED: Parameter loading can be handled in the main launch file
+    # The blimp.yaml parameters will be loaded by specific nodes that need them
+
+    # IMPROVED: Event handler with timer to ensure proper sequencing
+    spawn_entity_delayed = TimerAction(
+        period=2.0,  # Wait 2 seconds after robot_state_publisher starts
+        actions=[spawn_entity]
+    )
+
     spawn_entity_event = RegisterEventHandler(
         OnProcessStart(
             target_action=robot_state_publisher,
-            on_start=[spawn_entity]
+            on_start=[spawn_entity_delayed]
         )
     )
     
     return LaunchDescription([
-        # Launch arguments (same as before)
+        # Launch arguments (same as before but with corrected defaults)
         DeclareLaunchArgument('uav_name', default_value='blimp'),
         DeclareLaunchArgument('namespace', default_value='blimp'),
         DeclareLaunchArgument('model',

@@ -16,6 +16,7 @@ setup(
         'setuptools',
         'rclpy',
         'geometry_msgs',
+        'message_filters',
     ],
     zip_safe=True,
     maintainer='Eric Price',
