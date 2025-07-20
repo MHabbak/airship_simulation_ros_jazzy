@@ -5,7 +5,7 @@
   <version>2.0.0</version>
   <description>Gazebo Harmonic plugins for blimp simulation</description>
   <maintainer email="mahabbak@gmail.com">Mohamed ElHabbak</maintainer>
-  <license>Apache 2.0</license>
+  <license>Apache-2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 
@@ -18,12 +18,12 @@
   <depend>gz_common_vendor</depend>
   <depend>gz_sim_vendor</depend>
 
-  <!-- Messages dependancy -->
+  <!-- Messages dependency -->
   <depend>msgs</depend>
   <depend>sensor_msgs</depend>
   <depend>geometry_msgs</depend>
   <depend>nav_msgs</depend>
-  <depend>std_msgs</depend>
+  
 
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

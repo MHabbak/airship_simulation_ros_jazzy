@@ -6,6 +6,8 @@
   <xacro:property name="PI" value="3.14159265359" />
 
   <xacro:arg name="namespace" default="blimp"/>
+  <!-- ADDED: Missing launch argument that was referenced in launch files -->
+  <xacro:arg name="enable_custom_plugins" default="true"/>
 
   <!--*****************  component description  *****************-->
   <xacro:include filename="$(find blimp_description)/urdf/plugin_control.xacro" />
@@ -28,5 +30,9 @@
   <!--*****************  physics and extra plugins description  *****************-->
   <xacro:include filename="$(find blimp_description)/urdf/description_plugin.xacro"/>
 
-  
+  <!-- ROS 2 Control hardware interface (Gazebo Harmonic) - FIXED -->
+  <gazebo>
+    <plugin name="gz_ros2_control" filename="gz_ros2_control-system"/>
+  </gazebo>
+
 </robot>

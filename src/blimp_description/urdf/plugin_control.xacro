@@ -35,6 +35,10 @@
         <rotorVelocitySlowdownSim>1</rotorVelocitySlowdownSim>
         <!-- ADDED: Specify motor type to eliminate warning -->
         <motorType>velocity</motorType>
+        <!-- ADDED: ROS namespace configuration -->
+        <ros>
+          <namespace>${robot_namespace}</namespace>
+        </ros>
       </plugin>
     </gazebo>
   </xacro:macro>
@@ -116,9 +120,10 @@
       </joint>
     </ros2_control>
 
-    <!-- Gazebo ROS2 Control Plugin - FIXED PLUGIN NAME -->
+    <!-- Gazebo ROS2 Control Plugin - FIXED -->
     <gazebo>
-      <plugin filename="gz_ros2_control-system" name="gz_ros2_control::GazeboSimROS2ControlPlugin">
+      <plugin filename="gz_ros2_control-system" 
+              name="gz_ros2_control::GazeboSimROS2ControlPlugin">
         <parameters>$(find blimp_description)/resource/controller_blimp.yaml</parameters>
         <ros>
           <namespace>${namespace}</namespace>
@@ -151,7 +156,8 @@
   <xacro:macro name="controller_plugin_macro" params="namespace imu_sub_topic">
     <!-- Custom ROS2 controller interface -->
     <gazebo>
-      <plugin filename="gz-sim-triggered-publisher-system" name="gz::sim::systems::TriggeredPublisher">
+      <plugin filename="gz-sim-triggered-publisher-system" 
+              name="gz::sim::systems::TriggeredPublisher">
         <input type="gz.msgs.Twist" topic="/${namespace}/cmd_vel">
           <match field="linear.x">0.0</match>
         </input>

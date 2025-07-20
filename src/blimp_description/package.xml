@@ -5,7 +5,7 @@
   <description>Blimp robot description for ROS2/Gazebo Harmonic</description>
 
   <maintainer email="mahabbak@your-email.com">Mohamed Elhabbak</maintainer>
-  <license>Apache 2.0</license>
+  <license>Apache-2.0</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
   
@@ -20,6 +20,7 @@
   <!-- ROS2 Control -->
   <depend>ros2_control</depend>
   <depend>ros2_controllers</depend>
+  <depend>controller_manager</depend>
   <depend>gz_ros2_control</depend>
   
   <!-- Gazebo Harmonic -->
@@ -42,6 +43,11 @@
   <depend>tf2_ros</depend>
   <depend>tf2_geometry_msgs</depend>
   
+  <!-- Launch and Utilities -->
+  <depend>launch</depend>
+  <depend>launch_ros</depend>
+  <depend>ament_index_python</depend>
+  
   <!-- Visualization -->
   <depend>rviz2</depend>
   <depend>rviz_common</depend>
@@ -49,7 +55,6 @@
   
   <!-- MAVLink support (temporary for LibrePilot bridge) -->
   <depend>mavros_msgs</depend>
-
   
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>

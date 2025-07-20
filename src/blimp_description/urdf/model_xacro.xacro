@@ -151,33 +151,40 @@
   <!-- =============================================================== -->
 
   <!-- Spring/flexible joint macro for realistic deformation -->
+  <!-- FIXED: Using original ROS1 inertia values -->
   <xacro:macro name="spring" 
     params="robot_namespace link_name parent strength_factor:=1.0 
-            roll_factor:=1.0 pitch_factor:=1.0 yaw_factor:=1.0 *origin">
+            roll_factor:=1.0 pitch_factor:=5.0 yaw_factor:=10.0 *origin">
     
     <!-- Create intermediate links for 3-DOF flexibility -->
+    <!-- FIXED: Original ROS1 values -->
     <link name="${link_name}_link0">
       <inertial>
-        <mass value="1e-6"/>
+        <mass value="0.0001"/><!-- MUST be non zero or the link will be pruned by gazebo -->
         <origin xyz="0 0 0" rpy="0 0 0"/>
-        <inertia ixx="1e-9" ixy="0" ixz="0" iyy="1e-9" iyz="0" izz="1e-9"/>
+        <inertia ixx="0.01" ixy="0.0" ixz="0.0" iyy="0.01" iyz="0.0" izz="0.01" />
       </inertial>
     </link>
     
     <link name="${link_name}_link1">
       <inertial>
-        <mass value="1e-6"/>
+        <mass value="0.0001"/><!-- MUST be non zero or the link will be pruned by gazebo -->
         <origin xyz="0 0 0" rpy="0 0 0"/>
-        <inertia ixx="1e-9" ixy="0" ixz="0" iyy="1e-9" iyz="0" izz="1e-9"/>
+        <inertia ixx="0.01" ixy="0.0" ixz="0.0" iyy="0.01" iyz="0.0" izz="0.01" />
       </inertial>
     </link>
     
     <link name="${link_name}_link">
       <inertial>
-        <mass value="1e-6"/>
+        <mass value="0.0001"/><!-- MUST be non zero or the link will be pruned by gazebo -->
         <origin xyz="0 0 0" rpy="0 0 0"/>
-        <inertia ixx="1e-9" ixy="0" ixz="0" iyy="1e-9" iyz="0" izz="1e-9"/>
+        <inertia ixx="0.01" ixy="0.0" ixz="0.0" iyy="0.01" iyz="0.0" izz="0.01" />
       </inertial>
+      <visual>
+        <geometry>
+          <cylinder radius="0.01" length="0.3"/>
+        </geometry>
+      </visual>
     </link>
 
     <!-- Joint chain for 3-DOF spring behavior -->

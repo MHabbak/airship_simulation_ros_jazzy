@@ -8,15 +8,14 @@ setup(
     version='0.0.0',
     packages=find_packages(include=[package_name, package_name + '.*']),
     data_files=[
-    ('share/ament_index/resource_index/packages', ['resource/fake_gps_drift']),
-    ('share/fake_gps_drift', ['package.xml']),
-    ('share/fake_gps_drift/launch', ['launch/default.launch.py']),
+        ('share/ament_index/resource_index/packages', ['resource/fake_gps_drift']),
+        ('share/fake_gps_drift', ['package.xml']),
+        ('share/fake_gps_drift/launch', ['launch/default.launch.py']),
     ],
     install_requires=[    
         'setuptools',
         'rclpy',
         'geometry_msgs',
-        'message_filters'
     ],
     zip_safe=True,
     maintainer='Eric Price',
@@ -30,4 +29,3 @@ setup(
         ],
     },
 )
-
