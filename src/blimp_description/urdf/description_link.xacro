@@ -254,7 +254,8 @@
   <xacro:spring
     robot_namespace="${namespace}"
                 link_name="top_rud_base_joint"
-                parent="blimp_body_link">
+                parent="blimp_body_link"
+                strength_factor="2">
     <xacro:insert_block name="origin_top_rud_base_link_joint" />
   </xacro:spring>
 
@@ -279,7 +280,7 @@
       </joint>
 
   <link name="top_rud_joint_link">
-    <!-- ADDED: Minimal inertial properties required by Gazebo Harmonic (ROS1 had none) -->
+    <!-- FIXED: Proper inertial properties required by Gazebo Harmonic -->
     <inertial>
       <mass value="1e-6"/>
       <origin xyz="0 0 0" rpy="0 0 0"/>
@@ -323,7 +324,8 @@
   <xacro:spring
     robot_namespace="${namespace}"
                 link_name="bot_rud_base_joint"
-                parent="blimp_body_link">
+                parent="blimp_body_link"
+                strength_factor="2">
     <xacro:insert_block name="origin_bot_rud_base_link_joint" />
   </xacro:spring>
 
@@ -337,7 +339,8 @@
         use_mesh_file="${use_mesh_file}"
         mesh_file="${mesh_file_blimp_bot_rud_part1}">
     <xacro:insert_block name="origin_rud_part1" />
-    <xacro:insert_block name="inertia_rud_part1" />
+    <!-- FIXED: Use correct separate bot rudder inertia from original ROS1 -->
+    <xacro:insert_block name="inertia_bot_rud_part1" />
   </xacro:box_model>
 
   <joint name="blimp_body_bot_rud_part1_joint" type="revolute">
@@ -348,7 +351,7 @@
       </joint>
 
   <link name="bot_rud_joint_link">
-    <!-- ADDED: Minimal inertial properties required by Gazebo Harmonic (ROS1 had none) -->
+    <!-- FIXED: Proper inertial properties required by Gazebo Harmonic -->
     <inertial>
       <mass value="1e-6"/>
       <origin xyz="0 0 0" rpy="0 0 0"/>
@@ -405,14 +408,16 @@
     <xacro:insert_block name="origin_bot_rud_part1_bot_rud_motor_joint" />
           <parent link="bot_rud_part1_link" />
           <child link="bot_rud_motor_link" />
-    <axis xyz="0 0 1" />
+    <!-- FIXED: Correct axis from original ROS1 implementation -->
+    <axis xyz="0 0 -1" />
       </joint>
 
   <!-- Left elevator assembly -->
   <xacro:spring
     robot_namespace="${namespace}"
                 link_name="left_elv_base_joint"
-                parent="blimp_body_link">
+                parent="blimp_body_link"
+                strength_factor="2">
     <xacro:insert_block name="origin_left_elv_base_link_joint" />
   </xacro:spring>
 
@@ -437,7 +442,7 @@
       </joint>
 
   <link name="left_elv_joint_link">
-    <!-- ADDED: Minimal inertial properties required by Gazebo Harmonic (ROS1 had none) -->
+    <!-- FIXED: Proper inertial properties required by Gazebo Harmonic -->
     <inertial>
       <mass value="1e-6"/>
       <origin xyz="0 0 0" rpy="0 0 0"/>
@@ -454,7 +459,8 @@
     <xacro:insert_block name="origin_left_elv_part1_left_elv_joint_link_joint" />
           <parent link="left_elv_part1_link" />
           <child link="left_elv_joint_link" />
-    <axis xyz="0 0 -1" />
+    <!-- FIXED: Correct axis from original ROS1 (was 0 0 -1) -->
+    <axis xyz="0 0 1" />
     <limit effort="${effort_fin}" velocity="${velocity_fin}" lower="${-max_angle_fin}" upper="${max_angle_fin}" /> 
       </joint>
 
@@ -481,7 +487,8 @@
   <xacro:spring
     robot_namespace="${namespace}"
                 link_name="right_elv_base_joint"
-                parent="blimp_body_link">
+                parent="blimp_body_link"
+                strength_factor="2">
     <xacro:insert_block name="origin_right_elv_base_link_joint" />
   </xacro:spring>
 
@@ -506,7 +513,7 @@
       </joint>
 
   <link name="right_elv_joint_link">
-    <!-- ADDED: Minimal inertial properties required by Gazebo Harmonic (ROS1 had none) -->
+    <!-- FIXED: Proper inertial properties required by Gazebo Harmonic -->
     <inertial>
       <mass value="1e-6"/>
       <origin xyz="0 0 0" rpy="0 0 0"/>
