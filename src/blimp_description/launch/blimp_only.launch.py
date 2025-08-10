@@ -18,7 +18,7 @@ def generate_launch_description():
     # Package Directories
     pkg_blimp_description = get_package_share_directory('blimp_description')
     
-    # ADDED: Set up Gazebo resource paths for mesh loading
+    # Set up Gazebo resource paths for mesh loading
     gazebo_resource_path = SetEnvironmentVariable(
         name='GZ_SIM_RESOURCE_PATH',
         value=[
@@ -33,7 +33,7 @@ def generate_launch_description():
     namespace = LaunchConfiguration('namespace')
     world_name = LaunchConfiguration('world_name')
     
-    # FIXED: Generate robot_description in the main launch file
+    # Generate robot_description in the main launch file
     robot_description = ParameterValue(
         Command([
             'xacro ', os.path.join(pkg_blimp_description, 'urdf', 'blimp_base.xacro'),
@@ -65,11 +65,11 @@ def generate_launch_description():
         }.items()
     )
         
-    # FIXED: Group for namespaced nodes (exactly like ROS1 <group ns="$(arg uav_name)">)
+    # Group for namespaced nodes 
     blimp_group = GroupAction([
         PushRosNamespace(namespace),
         
-        # FIXED: Robot state publisher with robot_description (mirrors ROS1 structure)
+        # Robot state publisher with robot_description
         Node(
             package='robot_state_publisher',
             executable='robot_state_publisher',
@@ -82,7 +82,7 @@ def generate_launch_description():
             output='screen'
         ),
         
-        # FIXED: Spawn entity that reads from the same namespace
+        # Spawn entity that reads from the same namespace
         Node(
             package='ros_gz_sim',
             executable='create',

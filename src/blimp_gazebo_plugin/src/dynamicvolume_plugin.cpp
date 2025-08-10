@@ -1,4 +1,4 @@
-// dynamicvolume_plugin.cpp - Implementation (Enhanced with safety checks)
+// dynamicvolume_plugin.cpp - Implementation (FIXED: Corrected buoyancy physics)
 #include "dynamicvolume_plugin.hpp"
 
 #include <gz/sim/components/Link.hh>
@@ -243,12 +243,34 @@ void DynamicVolumePlugin::Configure(const gz::sim::Entity &_entity,
     return;
   }
 
+  // ✅ ADD: Debug output to verify parameters are loaded correctly
+  gzmsg << "DynamicVolumePlugin Configuration Debug:" << std::endl;
+  gzmsg << "  Namespace: " << this->impl->ns << std::endl;
+  gzmsg << "  Link name: " << this->impl->linkName << std::endl;
+  gzmsg << "  Fluid density: " << this->impl->fluidDensity << " kg/m³" << std::endl;
+  gzmsg << "  Helium mass: " << this->impl->heliumMassKG << " kg" << std::endl;
+  gzmsg << "  Reference altitude: " << this->impl->refAlt << " m" << std::endl;
+
+  // Verify volume properties are loaded
+  for (const auto& [entity, props] : this->impl->volumePropsMap)
+  {
+    gzmsg << "  Link volume: " << props.volume << " m³" << std::endl;
+    gzmsg << "  Center of volume: " << props.cov << std::endl;
+    
+    // ✅ VERIFY: Expected neutral buoyancy calculation
+    double heliumDensity = this->impl->heliumMassKG / props.volume;
+    double netDensity = this->impl->fluidDensity - heliumDensity;
+    gzmsg << "  Expected net density: " << netDensity << " kg/m³" << std::endl;
+    gzmsg << "  Expected neutral force: " << (netDensity * props.volume * 9.80665) << " N" << std::endl;
+  }
+
   this->impl->initialized = true;
   gzdbg << "DynamicVolumePlugin: Successfully configured for model[" 
         << this->impl->modelName << "]" << std::endl;
 }
 
 /////////////////////////////////////////////////
+// ✅ COMPLETELY REWRITTEN: Proper atmospheric buoyancy calculation
 void DynamicVolumePlugin::PreUpdate(const gz::sim::UpdateInfo &/*_info*/,
                                     gz::sim::EntityComponentManager &_ecm)
 {
@@ -268,24 +290,44 @@ void DynamicVolumePlugin::PreUpdate(const gz::sim::UpdateInfo &/*_info*/,
 
     gz::math::Pose3d linkPose = poseComp->Data();
 
-    // Calculate dynamic volume based on altitude and helium mass
+    // ✅ FIXED: Proper atmospheric model
     double altitude = linkPose.Pos().Z() - this->impl->refAlt;
-    double pressureRatio = std::exp(-altitude / 8400.0); // Simplified atmospheric model
+    double pressureRatio = std::exp(-altitude / 8400.0); // Standard atmosphere scale height
     
-    // Ensure pressureRatio is within reasonable bounds
+    // Reasonable bounds for pressure ratio
     pressureRatio = std::max(0.1, std::min(10.0, pressureRatio));
     
-    double dynamicVolume = props.volume * (1.0 / pressureRatio) * (this->impl->heliumMassKG / 1.0);
+    // ✅ FIXED: Correct volume calculation (helium expands with lower pressure)
+    double dynamicVolume = props.volume * (1.0 / pressureRatio);
+    
+    // ✅ CRITICAL FIX: Calculate NET buoyancy (buoyant force - helium weight)
+    double airDensity = this->impl->fluidDensity * pressureRatio; // Air density at altitude
+    double heliumDensity = this->impl->heliumMassKG / dynamicVolume; // Current helium density
+    double netDensity = airDensity - heliumDensity; // Net density difference
+    
+    // ✅ FIXED: Direct force calculation (positive = upward)
+    double netBuoyancyForce = netDensity * dynamicVolume * 9.80665; // g = 9.80665 m/s²
+    
+    // // ✅ DEBUG: Add logging to verify calculations (only log occasionally to avoid spam)
+    // static int debugCounter = 0;
+    // debugCounter++;
+    // if (debugCounter % 1000 == 0) // Log every ~10 seconds at 100Hz
+    // {
+    //   gzmsg << "DynamicVolumePlugin Runtime Debug:" << std::endl
+    //         << "  Altitude: " << altitude << " m" << std::endl
+    //         << "  Pressure ratio: " << pressureRatio << std::endl
+    //         << "  Dynamic volume: " << dynamicVolume << " m³" << std::endl
+    //         << "  Air density: " << airDensity << " kg/m³" << std::endl
+    //         << "  Helium density: " << heliumDensity << " kg/m³" << std::endl
+    //         << "  Net density: " << netDensity << " kg/m³" << std::endl
+    //         << "  Net buoyancy force: " << netBuoyancyForce << " N" << std::endl;
+    // }
 
-    // Calculate buoyancy force
-    double buoyancyMagnitude = this->impl->fluidDensity * dynamicVolume * (-this->impl->gravity.Z());
-    gz::math::Vector3d buoyancyForce = -this->impl->gravity.Normalized() * buoyancyMagnitude;
-
-    // Create proper wrench message
+    // ✅ FIXED: Create proper wrench message with corrected force
     gz::msgs::Wrench wrenchMsg;
-    wrenchMsg.mutable_force()->set_x(buoyancyForce.X());
-    wrenchMsg.mutable_force()->set_y(buoyancyForce.Y());
-    wrenchMsg.mutable_force()->set_z(buoyancyForce.Z());
+    wrenchMsg.mutable_force()->set_x(0.0);
+    wrenchMsg.mutable_force()->set_y(0.0);
+    wrenchMsg.mutable_force()->set_z(netBuoyancyForce); // Direct Z-force application
     wrenchMsg.mutable_torque()->set_x(0.0);
     wrenchMsg.mutable_torque()->set_y(0.0);
     wrenchMsg.mutable_torque()->set_z(0.0);
@@ -302,7 +344,7 @@ void DynamicVolumePlugin::PreUpdate(const gz::sim::UpdateInfo &/*_info*/,
       wrenchComp->Data() = wrenchMsg;
     }
 
-    // Publish dynamic volume
+    // Publish dynamic volume for monitoring
     gz::msgs::Float dynamicVolumeMsg;
     dynamicVolumeMsg.set_data(dynamicVolume);
     this->impl->dynamicVolumePub.Publish(dynamicVolumeMsg);
@@ -315,6 +357,7 @@ void DynamicVolumePlugin::Implementation::HeliumMassCallback(const gz::msgs::Flo
   if (_msg.data() > 0.0)
   {
     this->heliumMassKG = _msg.data();
+    gzdbg << "DynamicVolumePlugin: Updated helium mass to " << this->heliumMassKG << " kg" << std::endl;
   }
   else
   {
@@ -326,10 +369,10 @@ void DynamicVolumePlugin::Implementation::HeliumMassCallback(const gz::msgs::Flo
 double DynamicVolumePlugin::Implementation::CalculateVolume(const gz::sim::Entity &/*_linkEntity*/,
                                                            gz::sim::EntityComponentManager &/*_ecm*/)
 {
-  // Simplified volume calculation
-  double volume = 1.0; // Default volume
+  // ✅ IMPROVED: Better default volume with warning
+  double volume = 10.472; // Use blimp's expected volume as default
   
-  gzwarn << "Using default volume calculation. "
+  gzwarn << "DynamicVolumePlugin: Using default volume calculation (" << volume << " m³). "
          << "For accurate simulation, specify volume in SDF." << std::endl;
   
   return volume;
@@ -342,7 +385,7 @@ gz::math::Vector3d DynamicVolumePlugin::Implementation::CalculateCenterOfVolume(
   // Simplified center of volume calculation
   gz::math::Vector3d centerOfVolume(0, 0, 0);
   
-  gzwarn << "Using default center of volume calculation. "
+  gzwarn << "DynamicVolumePlugin: Using default center of volume calculation (0,0,0). "
          << "For accurate simulation, specify center_of_volume in SDF." << std::endl;
   
   return centerOfVolume;

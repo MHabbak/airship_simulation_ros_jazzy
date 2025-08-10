@@ -42,6 +42,8 @@
   <!--*****************  physics and extra plugins description  *****************-->
   <xacro:include filename="$(find blimp_description)/urdf/description_plugin.xacro"/>
 
+  <!-- REMOVED: Duplicate Mavlink plugin definition - now handled in description_sensor.xacro -->
+
   <!-- ROS 2 Control hardware interface (Gazebo Harmonic) -->
   <gazebo>
     <plugin name="gz_ros2_control::GazeboSimROS2ControlPlugin" filename="gz_ros2_control-system">

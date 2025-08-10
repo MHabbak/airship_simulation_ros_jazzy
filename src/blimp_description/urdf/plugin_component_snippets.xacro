@@ -281,116 +281,20 @@
   </xacro:macro>
 
   <!-- =============================================================== -->
-  <!-- ==================== MAGNETOMETER MACRO ===================== -->
+  <!-- ======= REMOVED: Duplicate sensor macros causing conflicts ==== -->
   <!-- =============================================================== -->
-  <xacro:macro name="magnetometer_plugin_macro"
-    params="namespace magnetometer_suffix parent_link magnetometer_topic
-      mass_magnetometer_sensor ref_mag_north ref_mag_east ref_mag_down
-      noise_normal noise_uniform_initial_bias *inertia *origin">
-    
-    <!-- Magnetometer link -->
-    <link name="magnetometer${magnetometer_suffix}_link">
-      <inertial>
-        <xacro:insert_block name="inertia" />
-        <mass value="${mass_magnetometer_sensor}" />
-        <origin xyz="0 0 0" rpy="0 0 0" />
-      </inertial>
-    </link>
-
-    <!-- Magnetometer joint -->
-    <joint name="magnetometer${magnetometer_suffix}_joint" type="revolute">
-      <xacro:insert_block name="origin" />
-      <parent link="${parent_link}" />
-      <child link="magnetometer${magnetometer_suffix}_link" />
-      <limit upper="0" lower="0" effort="0" velocity="0" />
-    </joint>
-
-    <!-- Gazebo Harmonic magnetometer sensor -->
-    <gazebo reference="magnetometer${magnetometer_suffix}_link">
-      <sensor name="magnetometer${magnetometer_suffix}" type="magnetometer">
-        <always_on>true</always_on>
-        <update_rate>100</update_rate>
-        <magnetometer>
-          <x>
-            <noise type="gaussian">
-              <mean>0.0</mean>
-              <stddev>0.000000080</stddev>
-              <bias_mean>0.000000400</bias_mean>
-              <bias_stddev>0.000000400</bias_stddev>
-            </noise>
-          </x>
-          <y>
-            <noise type="gaussian">
-              <mean>0.0</mean>
-              <stddev>0.000000080</stddev>
-              <bias_mean>0.000000400</bias_mean>
-              <bias_stddev>0.000000400</bias_stddev>
-            </noise>
-          </y>
-          <z>
-            <noise type="gaussian">
-              <mean>0.0</mean>
-              <stddev>0.000000080</stddev>
-              <bias_mean>0.000000400</bias_mean>
-              <bias_stddev>0.000000400</bias_stddev>
-            </noise>
-          </z>
-        </magnetometer>
-        <plugin filename="gz-sim-magnetometer-system" name="gz::sim::systems::Magnetometer">
-          <ros>
-            <namespace>${namespace}</namespace>
-            <remapping>~/out:=${magnetometer_topic}</remapping>
-          </ros>
-        </plugin>
-      </sensor>
-    </gazebo>
-  </xacro:macro>
-
-  <!-- =============================================================== -->
-  <!-- ==================== PRESSURE SENSOR MACRO ================== -->
-  <!-- =============================================================== -->
-  <xacro:macro name="pressure_sensor_plugin_macro"
-    params="namespace pressure_sensor_suffix parent_link pressure_topic
-      mass_pressure_sensor reference_altitude pressure_variance *inertia *origin">
-    
-    <!-- Pressure sensor link -->
-    <link name="pressure_sensor${pressure_sensor_suffix}_link">
-      <inertial>
-        <xacro:insert_block name="inertia" />
-        <mass value="${mass_pressure_sensor}" />
-        <origin xyz="0 0 0" rpy="0 0 0" />
-      </inertial>
-    </link>
-
-    <!-- Pressure sensor joint -->
-    <joint name="pressure_sensor${pressure_sensor_suffix}_joint" type="revolute">
-      <xacro:insert_block name="origin" />
-      <parent link="${parent_link}" />
-      <child link="pressure_sensor${pressure_sensor_suffix}_link" />
-      <limit upper="0" lower="0" effort="0" velocity="0" />
-    </joint>
-
-    <!-- Gazebo Harmonic air pressure sensor -->
-    <gazebo reference="pressure_sensor${pressure_sensor_suffix}_link">
-      <sensor name="air_pressure${pressure_sensor_suffix}" type="air_pressure">
-        <always_on>true</always_on>
-        <update_rate>50</update_rate>
-        <air_pressure>
-          <reference_altitude>${reference_altitude}</reference_altitude>
-          <noise type="gaussian">
-            <mean>0.0</mean>
-            <stddev>${pressure_variance}</stddev>
-          </noise>
-        </air_pressure>
-        <plugin filename="gz-sim-air-pressure-system" name="gz::sim::systems::AirPressure">
-          <ros>
-            <namespace>${namespace}</namespace>
-            <remapping>~/out:=${pressure_topic}</remapping>
-          </ros>
-        </plugin>
-      </sensor>
-    </gazebo>
-  </xacro:macro>
+  <!-- 
+  ❌ REMOVED to fix sensor duplication:
+  - magnetometer_plugin_macro (now only in plugin_sensors.xacro)
+  - pressure_sensor_plugin_macro (now only in plugin_sensors.xacro)
+  - default_gps (now only in plugin_sensors.xacro)
+  - default_magnetometer (now only in plugin_sensors.xacro)
+  - default_pressure_sensor (now only in plugin_sensors.xacro)
+  
+  These macros were causing duplicate sensor creation which confused PX4's
+  sensor discovery mechanism. Now all sensor macros are centralized in
+  plugin_sensors.xacro to avoid conflicts.
+  -->
 
   <!-- =============================================================== -->
   <!-- ==================== VI SENSOR MACROS ======================= -->
@@ -599,58 +503,6 @@
       <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001" />
       <origin xyz="0.015 0 0.0113" rpy="0 0 0" />
     </xacro:imu_plugin_macro>
-  </xacro:macro>
-
-  <!-- =============================================================== -->
-  <!-- ==================== CONVENIENCE MACROS ===================== -->
-  <!-- =============================================================== -->
-  
-  <xacro:macro name="default_gps" params="namespace parent_link">
-    <xacro:gps_plugin_macro
-      namespace="${namespace}"
-      gps_suffix=""
-      parent_link="${parent_link}"
-      gps_topic="gps"
-      ground_speed_topic="ground_speed"
-      mass_gps_sensor="0.015"
-      horizontal_pos_std_dev="3.0"
-      vertical_pos_std_dev="6.0"
-      horizontal_vel_std_dev="0.1"
-      vertical_vel_std_dev="0.1">
-      <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001" />
-      <origin xyz="0 0 0" rpy="0 0 0" />
-    </xacro:gps_plugin_macro>
-  </xacro:macro>
-
-  <xacro:macro name="default_magnetometer" params="namespace parent_link">
-    <xacro:magnetometer_plugin_macro
-      namespace="${namespace}"
-      magnetometer_suffix=""
-      parent_link="${parent_link}"
-      magnetometer_topic="magnetic_field"
-      mass_magnetometer_sensor="0.015"
-      ref_mag_north="0.000021493"
-      ref_mag_east="0.000000815"
-      ref_mag_down="0.000042795"
-      noise_normal="0.000000080 0.000000080 0.000000080"
-      noise_uniform_initial_bias="0.000000400 0.000000400 0.000000400">
-      <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001" />
-      <origin xyz="0 0 0" rpy="0 0 0" />
-    </xacro:magnetometer_plugin_macro>
-  </xacro:macro>
-
-  <xacro:macro name="default_pressure_sensor" params="namespace parent_link">
-    <xacro:pressure_sensor_plugin_macro
-      namespace="${namespace}"
-      pressure_sensor_suffix=""
-      parent_link="${parent_link}"
-      pressure_topic="air_pressure"
-      mass_pressure_sensor="0.015"
-      reference_altitude="500.0"
-      pressure_variance="0.0">
-      <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001" />
-      <origin xyz="0 0 0" rpy="0 0 0" />
-    </xacro:pressure_sensor_plugin_macro>
   </xacro:macro>
 
 </robot>

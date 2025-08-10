@@ -8,54 +8,39 @@ endif()
 
 # Find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(ament_cmake_python REQUIRED)
 find_package(rclcpp REQUIRED)
+find_package(rclpy REQUIRED) 
 find_package(robot_state_publisher REQUIRED)
 find_package(xacro REQUIRED)
 # ADDED: Additional dependencies that might be needed for URDF processing
 find_package(urdf REQUIRED)
 find_package(urdf_parser_plugin REQUIRED)
+find_package(geometry_msgs REQUIRED)
+find_package(std_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
+find_package(nav_msgs REQUIRED)
+find_package(mavros_msgs REQUIRED)
+find_package(geographic_msgs REQUIRED)
 
-# Install launch files
+# Install Python scripts 
+install(PROGRAMS
+  script/px4_blimp_control.py
+  script/mavros_sensor_bridge.py
+  script/px4_sitl_launcher.py
+  DESTINATION lib/${PROJECT_NAME}
+)
+
+# Install directories
 install(DIRECTORY
   launch
-  DESTINATION share/${PROJECT_NAME}/
-)
-
-# Install URDF/xacro files
-install(DIRECTORY
   urdf
-  DESTINATION share/${PROJECT_NAME}/
-)
-
-# Install world files
-install(DIRECTORY
-  worlds
-  DESTINATION share/${PROJECT_NAME}/
-)
-
-# Install meshes
-install(DIRECTORY
   meshes
-  DESTINATION share/${PROJECT_NAME}/
-)
-
-# Install RViz configs
-install(DIRECTORY
+  worlds
   rviz
-  DESTINATION share/${PROJECT_NAME}/
-)
-
-# Install resource files (YAML configs)
-install(DIRECTORY
   resource
-  DESTINATION share/${PROJECT_NAME}/
-)
-
-# ADDED: Install script directory if it exists (mirrors ROS1 structure)
-install(DIRECTORY
   script
   DESTINATION share/${PROJECT_NAME}/
-  OPTIONAL
 )
 
 if(BUILD_TESTING)

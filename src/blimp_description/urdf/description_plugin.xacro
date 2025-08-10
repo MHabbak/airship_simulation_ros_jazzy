@@ -4,7 +4,7 @@
   <!-- Wind Plugin - Using your migrated normwind_plugin -->
   <xacro:if value="$(arg enable_wind)">
     <gazebo>
-      <!-- FIXED: Correct Gazebo Harmonic plugin filename format -->
+      <!-- FIXED: Correct plugin name to match registration -->
       <plugin filename="normwind_plugin" name="normwind_plugin::NormWindPlugin">
         <robotNamespace>${namespace}</robotNamespace>
         <linkName>blimp_body_link</linkName>
@@ -25,8 +25,8 @@
     
     <!-- Main body aerodynamics -->
     <gazebo>
-      <!-- FIXED: Correct Gazebo Harmonic plugin filename format -->
-      <plugin name="blimp_body_finliftdrag" filename="finliftdrag_plugin">
+      <!-- FIXED: Correct plugin name to match registration -->
+      <plugin name="finliftdrag_plugin::FinLiftDragPlugin" filename="finliftdrag_plugin">
         <robotNamespace>${namespace}</robotNamespace> 
         <link_name>blimp_body_link</link_name>
         <rho>1.2041</rho>
@@ -49,8 +49,8 @@
 
     <!-- Bottom rudder aerodynamics -->
     <gazebo>
-      <!-- FIXED: Correct Gazebo Harmonic plugin filename format -->
-      <plugin name="bot_rud_finliftdrag" filename="finliftdrag_plugin">
+      <!-- FIXED: Correct plugin name to match registration -->
+      <plugin name="finliftdrag_plugin::FinLiftDragPlugin" filename="finliftdrag_plugin">
         <robotNamespace>${namespace}</robotNamespace> 
         <link_name>bot_rud_part1_link</link_name>
         <control_joint_name>bot_rud_part1_bot_rud_joint_link_joint</control_joint_name>
@@ -75,8 +75,8 @@
 
     <!-- Top rudder aerodynamics -->
     <gazebo>
-      <!-- FIXED: Correct Gazebo Harmonic plugin filename format -->
-      <plugin name="top_rud_finliftdrag" filename="finliftdrag_plugin">
+      <!-- FIXED: Correct plugin name to match registration -->
+      <plugin name="finliftdrag_plugin::FinLiftDragPlugin" filename="finliftdrag_plugin">
         <robotNamespace>${namespace}</robotNamespace> 
         <link_name>top_rud_part1_link</link_name>
         <control_joint_name>top_rud_part1_top_rud_joint_link_joint</control_joint_name>
@@ -100,14 +100,14 @@
   <!-- Buoyancy Plugin - Using your migrated dynamicvolume_plugin -->
   <xacro:if value="$(arg enable_custom_plugins)">
     <gazebo>
-      <!-- FIXED: Correct Gazebo Harmonic plugin filename format -->
-      <plugin name="dynamicvolume_plugin" filename="dynamicvolume_plugin">
+      <!-- FIXED: Correct plugin name to match registration -->
+      <plugin name="dynamicvolume_plugin::DynamicVolumePlugin" filename="dynamicvolume_plugin">
         <robotNamespace>${namespace}</robotNamespace> 
         <linkName>blimp_body_link</linkName> 
         <dynamicVolumeTopic>dynamic_volume</dynamicVolumeTopic> 
         <heliumMassTopic>helium_mass</heliumMassTopic> 
-        <heliumMassKG>1.0</heliumMassKG> 
-        <refAlt>0</refAlt>
+        <heliumMassKG>1.723</heliumMassKG> 
+        <refAlt>341.0</refAlt>
         <fluidDensity>1.2041</fluidDensity>
         <frameId>world</frameId>
         <!-- Link volume properties -->
@@ -175,7 +175,7 @@
 
     <!-- Bottom rudder motor -->
     <gazebo>
-      <!-- FIXED: Correct Gazebo Harmonic built-in plugin filename -->
+      <!-- Correct Gazebo Harmonic built-in plugin filename -->
       <plugin filename="gz-sim-multicopter-motor-model-system" 
               name="gz::sim::systems::MulticopterMotorModel">
         <robotNamespace>${namespace}</robotNamespace>
@@ -200,7 +200,7 @@
     </gazebo>
   </xacro:if>
 
-  <!-- Ground Truth Odometry - This doesn't reference a specific sensor link -->
+  <!-- Ground Truth Odometry -->
   <xacro:if value="$(arg enable_ground_truth)">
     <gazebo>
       <!-- FIXED: Correct Gazebo Harmonic built-in plugin filename -->
@@ -215,6 +215,15 @@
         <odom_publish_frequency>50</odom_publish_frequency>
       </plugin>
     </gazebo>
+  </xacro:if>
+
+   
+  <!-- PX4 Integration - REMOVED broken plugin, using native GZ bridge instead -->
+  <!-- PX4 automatically connects to sensors when PX4_GZ_MODEL_NAME environment variable is set -->
+  <!-- This eliminates the need for the problematic gz-sim-multicopter-velocity-control-system plugin -->
+  <xacro:if value="$(arg enable_mavlink_interface)">
+    <!-- PX4 native integration enabled via environment variables in launch file -->
+    <!-- No additional plugins needed - PX4 gz_bridge handles sensor integration automatically -->
   </xacro:if>
 
 </robot>

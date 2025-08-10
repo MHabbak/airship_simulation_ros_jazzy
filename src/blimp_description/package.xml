@@ -2,7 +2,7 @@
 <package format="3">
   <name>blimp_description</name>
   <version>0.0.1</version>
-  <description>Blimp robot description for ROS2/Gazebo Harmonic</description>
+  <description>Blimp robot description for ROS2/Gazebo Harmonic with PX4 integration</description>
 
   <maintainer email="mahabbak@your-email.com">Mohamed Elhabbak</maintainer>
   <license>Apache-2.0</license>
@@ -55,8 +55,16 @@
   <!-- GPS Drift Simulation -->
   <depend>fake_gps_drift</depend>
   
-  <!-- TEMPORARY: MAVLink support for LibrePilot bridge (remove after migration) -->
+  <!-- PX4/MAVROS Integration (ADDED for PX4 support) -->
+  <depend>mavros</depend>
   <depend>mavros_msgs</depend>
+  <depend>geographic_msgs</depend>
+  <depend>mavros_extras</depend>
+  <depend>px4_msgs</depend>
+  <depend>px4_ros_com</depend>
+  
+  <!-- REMOVED: LibrePilot dependencies -->
+  <!-- <depend>roshitl</depend> -->
   
   <test_depend>ament_lint_auto</test_depend>
   <test_depend>ament_lint_common</test_depend>
