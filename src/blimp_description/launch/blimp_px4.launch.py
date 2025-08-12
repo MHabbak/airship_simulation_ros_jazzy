@@ -8,11 +8,9 @@ from launch.actions import (
     IncludeLaunchDescription,
     ExecuteProcess,
     SetEnvironmentVariable,
-    RegisterEventHandler,
     LogInfo,
     TimerAction
 )
-from launch.event_handlers import OnProcessStart
 from launch.substitutions import LaunchConfiguration, Command, EnvironmentVariable
 from launch.launch_description_sources import PythonLaunchDescriptionSource
 from launch_ros.actions import Node
@@ -26,6 +24,7 @@ def generate_launch_description():
     uav_name = LaunchConfiguration('uav_name')
     namespace = LaunchConfiguration('namespace')
     instance = LaunchConfiguration('instance')
+    use_sim_time = LaunchConfiguration('use_sim_time')
 
     # Set up Gazebo resource paths
     gazebo_resource_path = SetEnvironmentVariable(
@@ -58,7 +57,7 @@ def generate_launch_description():
         value_type=str
     )
 
-    # Launch Gazebo
+    # 1. Launch Gazebo
     gazebo = IncludeLaunchDescription(
         PythonLaunchDescriptionSource([
             os.path.join(pkg_ros_gz, 'launch', 'gz_sim.launch.py')
@@ -69,17 +68,17 @@ def generate_launch_description():
         }.items()
     )
 
-    # FIXED: Clock bridge with proper QoS settings
+    # 2. Clock bridge
     clock_bridge = Node(
         package='ros_gz_bridge',
         executable='parameter_bridge',
         name='clock_bridge',
         arguments=['/clock@rosgraph_msgs/msg/Clock[gz.msgs.Clock'],
-        parameters=[{'use_sim_time': True}],
+        parameters=[{'use_sim_time': use_sim_time}],
         output='screen'
     )
 
-    # Robot state publisher
+    # 3. Robot state publisher
     robot_state_publisher = Node(
         package='robot_state_publisher',
         executable='robot_state_publisher',
@@ -87,160 +86,140 @@ def generate_launch_description():
         namespace=namespace,
         parameters=[{
             'robot_description': robot_description,
-            'use_sim_time': True
+            'use_sim_time': use_sim_time
         }],
         output='screen'
     )
 
-    # MicroXRCE-DDS Agent for PX4 communication
+    # 4. MicroXRCE-DDS Agent
     microxrce_agent = ExecuteProcess(
         cmd=['MicroXRCEAgent', 'udp4', '-p', '8888'],
         name='microxrce_agent',
         output='screen'
     )
 
-    # Spawn blimp
-    spawn_blimp = Node(
-        package='ros_gz_sim',
-        executable='create',
-        name='spawn_blimp',
-        namespace=namespace,
-        arguments=[
-            '-name', uav_name,
-            '-topic', 'robot_description',
-            '-x', LaunchConfiguration('X'),
-            '-y', LaunchConfiguration('Y'),
-            '-z', LaunchConfiguration('Z')
-        ],
-        parameters=[{'use_sim_time': True}],
-        output='screen'
+    # 5. Spawn blimp with delay
+    spawn_blimp = TimerAction(
+        period=3.0,
+        actions=[
+            LogInfo(msg="Spawning blimp at ground level..."),
+            Node(
+                package='ros_gz_sim',
+                executable='create',
+                name='spawn_blimp',
+                namespace=namespace,
+                arguments=[
+                    '-name', uav_name,
+                    '-topic', 'robot_description',
+                    '-x', LaunchConfiguration('X'),
+                    '-y', LaunchConfiguration('Y'),
+                    '-z', LaunchConfiguration('Z')
+                ],
+                parameters=[{'use_sim_time': use_sim_time}],
+                output='screen'
+            )
+        ]
     )
 
-    # FIXED: Minimal simulation bridge (remove barometer that's causing issues)
-    blimp_simulation_bridge = Node(
-        package='ros_gz_bridge', 
-        executable='parameter_bridge',
-        name='blimp_simulation_bridge',
-        namespace=namespace,
-        arguments=[
-            # Basic sensor bridges that PX4 GZBridge expects
-            '/world/empty/model/blimp/link/imu_link/sensor/imu_sensor/imu@sensor_msgs/msg/Imu@gz.msgs.IMU',
-            '/world/empty/model/blimp/link/gps_link/sensor/gps/navsat@sensor_msgs/msg/NavSatFix@gz.msgs.NavSat',
-            '/world/empty/model/blimp/link/magnetometer_link/sensor/mag/magnetometer@sensor_msgs/msg/MagneticField@gz.msgs.Magnetometer',
-            
-            # Remove barometer bridge that's causing template specialization error
-            # Add it back later once the message type incompatibility is resolved
-            
-            # Essential simulation bridges
-            'joint_states@sensor_msgs/msg/JointState@gz.msgs.Model',
-            'odometry@nav_msgs/msg/Odometry@gz.msgs.Odometry',
-        ],
-        parameters=[{'use_sim_time': True}],
-        output='screen'
+    # 6. Start PX4 with delay
+    start_px4 = TimerAction(
+        period=6.0,
+        actions=[
+            LogInfo(msg="Starting PX4 with corrected airframe..."),
+            ExecuteProcess(
+                cmd=[
+                    './bin/px4',
+                    '-i', instance,
+                ],
+                name='px4_sitl',
+                output='screen',
+                cwd=os.path.expanduser('~/PX4-Autopilot/build/px4_sitl_default'),
+                env={
+                    **os.environ,
+                    'PX4_SYS_AUTOSTART': '4099',
+                    'PX4_GZ_MODEL_NAME': uav_name,
+                    'PX4_GZ_WORLD': 'empty',
+                    'PX4_SIMULATOR': 'gz',
+                    'PX4_SIM_SPEED_FACTOR': '1.0',
+                    'PX4_HOME_LAT': '47.397742',
+                    'PX4_HOME_LON': '8.545594',
+                    'PX4_HOME_ALT': '341.0',
+                    'PX4_MICRODDS_NS': namespace,
+                    'UXRCE_DDS_SYNCT': '0',
+                }
+            )
+        ]
     )
 
-    # FIXED: PX4 SITL with correct airframe and environment variables
-    px4_sitl = ExecuteProcess(
-        cmd=[
-            './bin/px4',
-            '-i', instance,
-        ],
-        name='px4_sitl',
-        output='screen',
-        cwd=os.path.expanduser('~/PX4-Autopilot/build/px4_sitl_default'),
-        additional_env={
-            # CRITICAL: Use the custom airframe we created
-            'PX4_SYS_AUTOSTART': '4099',       # Custom blimp airframe
-            
-            # CRITICAL: Connect to existing Gazebo model with exact name matching
-            'PX4_GZ_MODEL_NAME': uav_name,    # Must exactly match spawned model name
-            'PX4_GZ_WORLD': 'empty',          # Must match world name
-            'PX4_SIMULATOR': 'gz',
-            'PX4_SIM_SPEED_FACTOR': '1.0',
-            
-            # GPS coordinates (Zurich area) - must match your world coordinates
-            'PX4_HOME_LAT': '47.397742',
-            'PX4_HOME_LON': '8.545594', 
-            'PX4_HOME_ALT': '341.0',
-            
-            # MicroXRCE-DDS configuration
-            'PX4_MICRODDS_NS': namespace,     # Use dynamic namespace
-            'UXRCE_DDS_SYNCT': '0',           # Critical: Disable time sync conflicts
-        }
+    # 7. Optional: ROS sensor monitoring
+    start_ros_monitoring = TimerAction(
+        period=9.0,
+        actions=[
+            LogInfo(msg="Starting sensor topic monitoring..."),
+            Node(
+                package='ros_gz_bridge', 
+                executable='parameter_bridge',
+                name='ros_sensor_monitor',
+                arguments=[
+                    '/world/empty/model/blimp/link/base_link/sensor/imu_sensor/imu@sensor_msgs/msg/Imu[gz.msgs.IMU',
+                    '/world/empty/model/blimp/link/base_link/sensor/navsat_sensor/navsat@sensor_msgs/msg/NavSatFix[gz.msgs.NavSat',
+                    '/world/empty/model/blimp/link/base_link/sensor/air_pressure_sensor/air_pressure@sensor_msgs/msg/FluidPressure[gz.msgs.FluidPressure',
+                ],
+                remappings=[
+                    ('/world/empty/model/blimp/link/base_link/sensor/imu_sensor/imu', '/debug/gazebo_imu'),
+                    ('/world/empty/model/blimp/link/base_link/sensor/navsat_sensor/navsat', '/debug/gazebo_gps'),
+                    ('/world/empty/model/blimp/link/base_link/sensor/air_pressure_sensor/air_pressure', '/debug/gazebo_baro'),
+                ],
+                parameters=[{'use_sim_time': use_sim_time}],
+                output='screen'
+            )
+        ]
     )
 
-    # Monitor PX4 sensor data (for debugging)
-    px4_sensor_listener = Node(
-        package='px4_ros_com',
-        executable='sensor_combined_listener',
-        name='sensor_combined_listener',
-        parameters=[{'use_sim_time': True}],
-        output='screen'
-    )
-
-    # ===== SEQUENTIAL STARTUP HANDLERS =====
-    
-    spawn_handler = RegisterEventHandler(
-        OnProcessStart(
-            target_action=robot_state_publisher,
-            on_start=[
-                LogInfo(msg="Robot state publisher ready, spawning blimp in 1 second..."),
-                TimerAction(period=1.0, actions=[spawn_blimp])
-            ]
-        )
-    )
-
-    bridge_handler = RegisterEventHandler(
-        OnProcessStart(
-            target_action=spawn_blimp,
-            on_start=[
-                LogInfo(msg="Blimp spawned, starting minimal simulation bridge in 2 seconds..."),
-                TimerAction(period=2.0, actions=[blimp_simulation_bridge])
-            ]
-        )
-    )
-
-    px4_handler = RegisterEventHandler(
-        OnProcessStart(
-            target_action=blimp_simulation_bridge,
-            on_start=[
-                LogInfo(msg="Simulation bridge ready, starting PX4 with custom airframe in 3 seconds..."),
-                TimerAction(period=3.0, actions=[px4_sitl])
-            ]
-        )
-    )
-
-    listener_handler = RegisterEventHandler(
-        OnProcessStart(
-            target_action=px4_sitl,
-            on_start=[
-                LogInfo(msg="PX4 started with custom airframe, monitoring sensor data in 4 seconds..."),
-                TimerAction(period=4.0, actions=[px4_sensor_listener])
-            ]
-        )
+    # 8. System verification
+    verify_system = TimerAction(
+        period=12.0,
+        actions=[
+            LogInfo(msg="Running system verification..."),
+            ExecuteProcess(
+                cmd=['bash', '-c', '''
+                    echo "=== Checking PX4 Parameters ==="
+                    echo "param show SYS_AUTOSTART" | timeout 3 ~/PX4-Autopilot/Tools/mavlink_shell.py 0.0.0.0:14550 2>/dev/null || echo "PX4 not responding"
+                    echo "param show EKF2_HGT_REF" | timeout 3 ~/PX4-Autopilot/Tools/mavlink_shell.py 0.0.0.0:14550 2>/dev/null || echo "Could not check height reference"
+                    echo "=== Checking Health ==="
+                    echo "commander check" | timeout 3 ~/PX4-Autopilot/Tools/mavlink_shell.py 0.0.0.0:14550 2>/dev/null || echo "Commander not ready"
+                    echo "=== Checking ROS Topics ==="
+                    timeout 2 ros2 topic list | grep -E "(imu|gps|baro)" || echo "Sensor topics not available yet"
+                    echo "=== System Check Complete ==="
+                '''],
+                shell=True,
+                output='screen'
+            )
+        ]
     )
 
     return LaunchDescription([
         # Environment setup
         gazebo_resource_path,
         
-        # Launch arguments
+        # Launch arguments with corrected spawn height
         DeclareLaunchArgument('uav_name', default_value='blimp', description='Vehicle name'),
         DeclareLaunchArgument('namespace', default_value='blimp', description='ROS namespace'),
         DeclareLaunchArgument('instance', default_value='0', description='PX4 instance ID'),
         DeclareLaunchArgument('X', default_value='0.0', description='X spawn position'),
         DeclareLaunchArgument('Y', default_value='0.0', description='Y spawn position'),
-        DeclareLaunchArgument('Z', default_value='2.0', description='Z spawn position'),
+        DeclareLaunchArgument('Z', default_value='0.5', description='Z spawn position (CORRECTED: was 50.0)'),
+        DeclareLaunchArgument('use_sim_time', default_value='true', description='Use simulation time'),
 
-        # Core components (start immediately)
+        # Launch sequence - immediate starts
         gazebo,
         clock_bridge,
         robot_state_publisher,
         microxrce_agent,
 
-        # Sequential startup with proper sensor detection
-        spawn_handler,
-        bridge_handler,
-        px4_handler,
-        listener_handler,
+        # Timed sequence
+        spawn_blimp,           # T+3: Spawn blimp at 0.5m height
+        start_px4,             # T+6: Start PX4 with correct config
+        # start_ros_monitoring,  # T+9: Start ROS bridges
+        # verify_system,         # T+12: Check system status
     ])

@@ -12,7 +12,7 @@
       accelerometer_bias_correlation_time accelerometer_turn_on_bias_sigma
       *inertia *origin">
     
-    <!-- ✅ FIXED: Attach sensor directly to parent_link, no intermediate links -->
+    <!-- FIXED: Attach sensor directly to parent_link, no intermediate links -->
     <gazebo reference="${parent_link}">
       <sensor name="imu_sensor" type="imu">
         <always_on>true</always_on>
@@ -93,17 +93,23 @@
   <!-- =============================================================== -->
   <!-- ==================== GPS SENSOR MACRO ======================= -->
   <!-- =============================================================== -->
+
   <xacro:macro name="gps_plugin_macro"
     params="namespace gps_suffix parent_link gps_topic ground_speed_topic
       mass_gps_sensor horizontal_pos_std_dev vertical_pos_std_dev
       horizontal_vel_std_dev vertical_vel_std_dev *inertia *origin">
     
-    <!-- ✅ FIXED: Attach sensor directly to parent_link, no intermediate links -->
+    <!-- FIXED: Direct attachment to parent_link -->
     <gazebo reference="${parent_link}">
       <sensor name="navsat_sensor" type="navsat">
         <always_on>true</always_on>
         <update_rate>10.0</update_rate>
+      
+        <!-- FIXED: Add pose to ensure proper origin -->
+        <pose>0 0 0 0 0 0</pose>
+        
         <navsat>
+          <!-- CRITICAL: Explicitly reference world coordinates -->
           <position_sensing>
             <horizontal>
               <noise type="gaussian">
@@ -133,11 +139,10 @@
             </vertical>
           </velocity_sensing>
         </navsat>
-        <plugin filename="gz-sim-navsat-system" name="gz::sim::systems::NavSat">
-        </plugin>
       </sensor>
     </gazebo>
   </xacro:macro>
+
 
   <!-- =============================================================== -->
   <!-- =============== MAGNETOMETER SENSOR MACRO =================== -->
@@ -146,7 +151,7 @@
     params="namespace magnetometer_suffix parent_link magnetometer_topic
       mass_magnetometer_sensor noise_density *inertia *origin">
     
-    <!-- ✅ FIXED: Attach sensor directly to parent_link, no intermediate links -->
+    <!-- FIXED: Attach sensor directly to parent_link, no intermediate links -->
     <gazebo reference="${parent_link}">
       <sensor name="mag_sensor" type="magnetometer">
         <always_on>true</always_on>
@@ -184,7 +189,7 @@
     params="namespace pressure_suffix parent_link pressure_topic
       mass_pressure_sensor noise_density *inertia *origin">
     
-    <!-- ✅ FIXED: Attach sensor directly to parent_link, no intermediate links -->
+    <!-- FIXED: Attach sensor directly to parent_link, no intermediate links -->
     <gazebo reference="${parent_link}">
       <sensor name="air_pressure_sensor" type="air_pressure">
         <always_on>true</always_on>
@@ -214,7 +219,7 @@
       noise_uniform_quaternion noise_uniform_linear_velocity noise_uniform_angular_velocity
       enable_odometry_map odometry_map image_scale *inertia *origin">
     
-    <!-- ✅ ROS2 Odometry (separate from PX4 sensor discovery) -->
+    <!-- ROS2 Odometry (separate from PX4 sensor discovery) -->
     <gazebo reference="${parent_link}">
       <plugin filename="gz-sim-odometry-publisher-system" name="gz::sim::systems::OdometryPublisher">
         <ros>
@@ -236,21 +241,22 @@
   <!-- =============================================================== -->
   
   <xacro:macro name="ground_truth_imu_and_odometry" params="namespace parent_link">
-    <!-- Mount an IMU providing ground truth. -->
+    <!-- FIXED: Ground truth with minimal but non-zero noise -->
+    <!-- WAS: 0.0 values - NOW: minimal noise for stability -->
     <xacro:imu_plugin_macro
       namespace="${namespace}"
       imu_suffix="_gt"
       parent_link="${parent_link}"
       imu_topic="ground_truth/imu"
       mass_imu_sensor="0.00001"
-      gyroscope_noise_density="0.0"
-      gyroscope_random_walk="0.0"
+      gyroscope_noise_density="0.00001"
+      gyroscope_random_walk="0.000001"
       gyroscope_bias_correlation_time="1000.0"
-      gyroscope_turn_on_bias_sigma="0.0"
-      accelerometer_noise_density="0.0"
-      accelerometer_random_walk="0.0"
+      gyroscope_turn_on_bias_sigma="0.001"
+      accelerometer_noise_density="0.001"
+      accelerometer_random_walk="0.0001"
       accelerometer_bias_correlation_time="300.0"
-      accelerometer_turn_on_bias_sigma="0.0">
+      accelerometer_turn_on_bias_sigma="0.001">
       <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001" />
       <origin xyz="0 0 0" rpy="0 0 0" />
     </xacro:imu_plugin_macro>
@@ -288,21 +294,22 @@
   </xacro:macro>
 
   <xacro:macro name="tail_imu_and_odometry" params="namespace parent_link">
-    <!-- Mount an IMU for tail. -->
+    <!-- FIXED: Tail sensors with minimal but non-zero noise -->
+    <!-- WAS: 0.0 values - NOW: minimal noise for stability -->
     <xacro:imu_plugin_macro
       namespace="${namespace}"
       imu_suffix="_tail"
       parent_link="${parent_link}"
       imu_topic="tail/imu"
       mass_imu_sensor="0.00001"
-      gyroscope_noise_density="0.0"
-      gyroscope_random_walk="0.0"
+      gyroscope_noise_density="0.00001"
+      gyroscope_random_walk="0.000001"
       gyroscope_bias_correlation_time="1000.0"
-      gyroscope_turn_on_bias_sigma="0.0"
-      accelerometer_noise_density="0.0"
-      accelerometer_random_walk="0.0"
+      gyroscope_turn_on_bias_sigma="0.001"
+      accelerometer_noise_density="0.001"
+      accelerometer_random_walk="0.0001"
       accelerometer_bias_correlation_time="300.0"
-      accelerometer_turn_on_bias_sigma="0.0">
+      accelerometer_turn_on_bias_sigma="0.001">
       <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001" />
       <origin xyz="0 0 0" rpy="${pi} 0 0" />
     </xacro:imu_plugin_macro>
@@ -339,9 +346,9 @@
     </xacro:odometry_plugin_macro>
   </xacro:macro>
 
-  <!-- ✅ PRIMARY FLIGHT CONTROL SENSORS (attach directly to parent_link) -->
+  <!-- PRIMARY FLIGHT CONTROL SENSORS (attach directly to parent_link) -->
   <xacro:macro name="default_imu" params="namespace parent_link">
-    <!-- ADIS16448 IMU for PX4 flight control -->
+    <!-- ADIS16448 IMU for PX4 flight control - REALISTIC VALUES FROM ROS1 -->
     <xacro:imu_plugin_macro
       namespace="${namespace}"
       imu_suffix=""
@@ -353,34 +360,33 @@
       gyroscope_bias_correlation_time="1000.0"
       gyroscope_turn_on_bias_sigma="0.0087"
       accelerometer_noise_density="0.004"
-      accelerometer_random_walk="0.006"
+      accelerometer_random_walk="0.0001"
       accelerometer_bias_correlation_time="300.0"
-      accelerometer_turn_on_bias_sigma="0.1960">
+      accelerometer_turn_on_bias_sigma="0.001">
       <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001" />
       <origin xyz="0 0 0" rpy="0 0 0" />
     </xacro:imu_plugin_macro>
   </xacro:macro>
 
   <xacro:macro name="default_gps" params="namespace parent_link">
-    <!-- GPS for PX4 navigation -->
     <xacro:gps_plugin_macro
       namespace="${namespace}"
       gps_suffix=""
       parent_link="${parent_link}"
-      gps_topic="gps"
-      ground_speed_topic="ground_speed"
+      gps_topic="/gps"
+      ground_speed_topic="/ground_speed"
       mass_gps_sensor="0.015"
-      horizontal_pos_std_dev="3.0"
-      vertical_pos_std_dev="6.0"
-      horizontal_vel_std_dev="0.1"
-      vertical_vel_std_dev="0.1">
+      horizontal_pos_std_dev="0.0"
+      vertical_pos_std_dev="0.0"
+      horizontal_vel_std_dev="0.0"
+      vertical_vel_std_dev="0.0">
       <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001" />
       <origin xyz="0 0 0" rpy="0 0 0" />
     </xacro:gps_plugin_macro>
   </xacro:macro>
 
   <xacro:macro name="default_magnetometer" params="namespace parent_link">
-    <!-- Magnetometer for PX4 heading estimation -->
+    <!-- Magnetometer for PX4 heading estimation - REALISTIC VALUES -->
     <xacro:magnetometer_plugin_macro
       namespace="${namespace}"
       magnetometer_suffix=""
@@ -394,14 +400,14 @@
   </xacro:macro>
 
   <xacro:macro name="default_pressure_sensor" params="namespace parent_link">
-    <!-- Barometer for PX4 altitude estimation -->
+    <!-- CRITICAL FIX: Barometer with proper noise to prevent STALE errors -->
     <xacro:pressure_sensor_plugin_macro
       namespace="${namespace}"
       pressure_suffix=""
       parent_link="${parent_link}"
       pressure_topic="air_pressure"
       mass_pressure_sensor="0.005"
-      noise_density="0.01">
+      noise_density="0.02">
       <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001" />
       <origin xyz="0 0 0" rpy="0 0 0" />
     </xacro:pressure_sensor_plugin_macro>
