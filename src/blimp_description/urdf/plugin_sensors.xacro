@@ -14,7 +14,7 @@
     
     <!-- FIXED: Attach sensor directly to parent_link, no intermediate links -->
     <gazebo reference="${parent_link}">
-      <sensor name="imu_sensor" type="imu">
+      <sensor name="imu_sensor${imu_suffix}" type="imu">
         <always_on>true</always_on>
         <update_rate>250</update_rate>
         <imu>
@@ -153,7 +153,7 @@
     
     <!-- FIXED: Attach sensor directly to parent_link, no intermediate links -->
     <gazebo reference="${parent_link}">
-      <sensor name="mag_sensor" type="magnetometer">
+      <sensor name="magnetometer_sensor" type="magnetometer">
         <always_on>true</always_on>
         <update_rate>50</update_rate>
         <magnetometer>
@@ -196,10 +196,12 @@
         <update_rate>50</update_rate>
         <air_pressure>
           <reference_altitude>341</reference_altitude>
-          <noise type="gaussian">
-            <mean>0.0</mean>
-            <stddev>${noise_density}</stddev>
-          </noise>
+          <pressure>
+            <noise type="gaussian">
+              <mean>0.0</mean>
+              <stddev>${noise_density}</stddev>
+            </noise>
+          </pressure>
         </air_pressure>
         <plugin filename="gz-sim-air-pressure-system" name="gz::sim::systems::AirPressure">
         </plugin>
@@ -407,7 +409,7 @@
       parent_link="${parent_link}"
       pressure_topic="air_pressure"
       mass_pressure_sensor="0.005"
-      noise_density="0.02">
+      noise_density="20">
       <inertia ixx="0.00001" ixy="0.0" ixz="0.0" iyy="0.00001" iyz="0.0" izz="0.00001" />
       <origin xyz="0 0 0" rpy="0 0 0" />
     </xacro:pressure_sensor_plugin_macro>

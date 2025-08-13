@@ -3,25 +3,16 @@
 
   <!-- ✅ MINIMAL: Only essential sensors for PX4 (no duplicates, no extras) -->
   
-  <xacro:if value="$(arg enable_sensors)">
-    <!-- ✅ ONLY ESSENTIAL PX4 SENSORS (single instance each on base_link) -->
-    
-    <!-- Main IMU for flight control -->
-    <xacro:default_imu namespace="${namespace}" parent_link="base_link" />
-    
-    <!-- GPS for navigation (coordinates should be set in GPS macro) -->
-    <xacro:default_gps namespace="${namespace}" parent_link="base_link" /> 
-    
-    <!-- Barometer for altitude estimation (fixed noise to prevent STALE) --> 
-    <xacro:default_pressure_sensor namespace="${namespace}" parent_link="base_link" />
-    
-    <!-- ❌ DISABLED: Magnetometer (causing conflicts and disabled in PX4 anyway) -->
-    <!-- <xacro:default_magnetometer namespace="${namespace}" parent_link="base_link" /> -->
-    
+  <xacro:if value="$(arg enable_sensors)">    
+      <!-- Main IMU for flight control -->
+      <xacro:default_imu namespace="${namespace}" parent_link="base_link" />              <!-- Creates imu_sensor -->
+      <xacro:default_gps namespace="${namespace}" parent_link="base_link" /> 
+      <xacro:default_pressure_sensor namespace="${namespace}" parent_link="base_link" />
+      <xacro:default_magnetometer namespace="${namespace}" parent_link="base_link" />    <!-- Creates mag_sensor -->
   </xacro:if>
 
-  <!-- ❌ DISABLED: Ground truth sensors (not needed for basic flight) -->
-  <!-- ❌ DISABLED: Camera sensors (not needed for basic flight) -->
-  <!-- ❌ DISABLED: Additional sensors (airspeed, optical flow, lidar) -->
-
+    <!-- SEPARATE BLOCK: Ground truth only if needed for debugging -->
+  <!-- <xacro:if value="$(arg enable_ground_truth)">
+      <xacro:ground_truth_imu_and_odometry namespace="${namespace}" parent_link="base_link" /> 
+  </xacro:if> -->
 </robot>
