@@ -121,81 +121,62 @@
 
   <!-- MOTOR PLUGINS - FIXED: Conditional inclusion -->
   <xacro:if value="$(arg enable_physics)">
-    <!-- Left blade motor -->
-    <gazebo>
-      <!-- FIXED: Correct Gazebo Harmonic built-in plugin filename -->
-      <plugin filename="gz-sim-multicopter-motor-model-system" 
-              name="gz::sim::systems::MulticopterMotorModel">
-        <robotNamespace>${namespace}</robotNamespace>
-        <linkName>left_blade_link</linkName>
-        <jointName>stick_left_blade_joint</jointName>
-        <turningDirection>ccw</turningDirection>
-        <timeConstantUp>0.0125</timeConstantUp>
-        <timeConstantDown>0.025</timeConstantDown>
-        <maxRotVelocity>838</maxRotVelocity>
-        <motorConstant>8.54858e-06</motorConstant>
-        <momentConstant>0.016</momentConstant>
-        <commandSubTopic>command/motor_speed</commandSubTopic>
-        <actuator_number>0</actuator_number>
-        <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
-        <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
-        <motorSpeedPubTopic>motor_speed/0</motorSpeedPubTopic>
-        <motorType>velocity</motorType>
-        <ros>
-          <namespace>${namespace}</namespace>
-        </ros>
-      </plugin>
-    </gazebo>
-
     <!-- Right blade motor -->
     <gazebo>
-      <!-- FIXED: Correct Gazebo Harmonic built-in plugin filename -->
-      <plugin filename="gz-sim-multicopter-motor-model-system" 
-              name="gz::sim::systems::MulticopterMotorModel">
-        <robotNamespace>${namespace}</robotNamespace>
-        <linkName>right_blade_link</linkName>
-        <jointName>stick_right_blade_joint</jointName>
-        <turningDirection>cw</turningDirection>
-        <timeConstantUp>0.0125</timeConstantUp>
-        <timeConstantDown>0.025</timeConstantDown>
-        <maxRotVelocity>838</maxRotVelocity>
-        <motorConstant>8.54858e-06</motorConstant>
-        <momentConstant>0.016</momentConstant>
-        <commandSubTopic>command/motor_speed</commandSubTopic>
-        <actuator_number>1</actuator_number>
-        <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
-        <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
-        <motorSpeedPubTopic>motor_speed/1</motorSpeedPubTopic>
-        <motorType>velocity</motorType>
-        <ros>
-          <namespace>${namespace}</namespace>
-        </ros>
-      </plugin>
-    </gazebo>
+      <!-- CORRECTED: Motor plugins using native Actuators interface -->
 
-    <!-- Bottom rudder motor -->
-    <gazebo>
-      <!-- Correct Gazebo Harmonic built-in plugin filename -->
+      <!-- Motor 0: Left Blade -->
       <plugin filename="gz-sim-multicopter-motor-model-system" 
               name="gz::sim::systems::MulticopterMotorModel">
         <robotNamespace>${namespace}</robotNamespace>
-        <linkName>bot_rud_motor_link</linkName>
-        <jointName>bot_rud_part1_bot_rud_motor_joint</jointName>
+        <jointName>stick_left_blade_joint</jointName>
+        <linkName>left_blade_link</linkName>
+        <actuator_number>0</actuator_number>
+        <turningDirection>ccw</turningDirection>
+        REMOVED: <commandSubTopic>command/motor_speed</commandSubTopic>
+        <motorSpeedPubTopic>motor_speed/0</motorSpeedPubTopic>
+        <motorConstant>9.9865e-06</motorConstant>         <!-- Keep original physics -->
+        <momentConstant>0.016</momentConstant>             
+        <timeConstantUp>0.0125</timeConstantUp>
+        <timeConstantDown>0.025</timeConstantDown>
+        <maxRotVelocity>838</maxRotVelocity>               <!-- Plugin will scale to this -->
+        <motorType>velocity</motorType>
+      </plugin>
+
+      <!-- Motor 1: Right Blade -->  
+      <plugin filename="gz-sim-multicopter-motor-model-system" 
+              name="gz::sim::systems::MulticopterMotorModel">
+        <robotNamespace>${namespace}</robotNamespace>
+        <jointName>stick_right_blade_joint</jointName>
+        <linkName>right_blade_link</linkName>
+        <actuator_number>1</actuator_number>
         <turningDirection>cw</turningDirection>
+        REMOVED: <commandSubTopic>command/motor_speed</commandSubTopic>
+        <motorSpeedPubTopic>motor_speed/1</motorSpeedPubTopic>
+        <motorConstant>9.9865e-06</motorConstant>         
+        <momentConstant>0.016</momentConstant>             
         <timeConstantUp>0.0125</timeConstantUp>
         <timeConstantDown>0.025</timeConstantDown>
         <maxRotVelocity>838</maxRotVelocity>
-        <motorConstant>8.54858e-06</motorConstant>
-        <momentConstant>0.016</momentConstant>
-        <commandSubTopic>command/motor_speed</commandSubTopic>
-        <actuator_number>2</actuator_number>
-        <rotorDragCoefficient>8.06428e-05</rotorDragCoefficient>
-        <rollingMomentCoefficient>1e-06</rollingMomentCoefficient>
-        <motorSpeedPubTopic>motor_speed/2</motorSpeedPubTopic>
         <motorType>velocity</motorType>
-        <ros>
-          <namespace>${namespace}</namespace>
-        </ros>
+      </plugin>
+
+      <!-- Motor 2: Bottom Rudder -->
+      <plugin filename="gz-sim-multicopter-motor-model-system" 
+              name="gz::sim::systems::MulticopterMotorModel">
+        <robotNamespace>${namespace}</robotNamespace>
+        <jointName>bot_rud_part1_bot_rud_motor_joint</jointName>
+        <linkName>bot_rud_motor_link</linkName>
+        <actuator_number>2</actuator_number>
+        <turningDirection>cw</turningDirection>
+        REMOVED: <commandSubTopic>command/motor_speed</commandSubTopic>
+        <motorSpeedPubTopic>motor_speed/2</motorSpeedPubTopic>
+        <motorConstant>9.9865e-06</motorConstant>         
+        <momentConstant>0.016</momentConstant>             
+        <timeConstantUp>0.0125</timeConstantUp>
+        <timeConstantDown>0.025</timeConstantDown>
+        <maxRotVelocity>838</maxRotVelocity>
+        <motorType>velocity</motorType>
       </plugin>
     </gazebo>
   </xacro:if>
