@@ -11,6 +11,15 @@
       <xacro:default_magnetometer namespace="${namespace}" parent_link="base_link" />    <!-- Creates mag_sensor -->
   </xacro:if>
 
+
+  <xacro:if value="$(arg enable_sensors)">
+		<!-- <xacro:include filename="$(find blimp_description)/urdf/asus_camera.urdf.xacro" />
+		<xacro:asus_camera
+		    name="xtion"
+		    parent="gondola_body_link">
+		    <origin xyz="0.18 0.0 0.07" rpy="0 0.7853 0"/>
+		</xacro:asus_camera> -->
+	</xacro:if>
     <!-- SEPARATE BLOCK: Ground truth only if needed for debugging -->
   <!-- <xacro:if value="$(arg enable_ground_truth)">
       <xacro:ground_truth_imu_and_odometry namespace="${namespace}" parent_link="base_link" /> 

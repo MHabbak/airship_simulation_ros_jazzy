@@ -133,12 +133,12 @@
         <linkName>left_blade_link</linkName>
         <actuator_number>0</actuator_number>
         <turningDirection>ccw</turningDirection>
-        REMOVED: <commandSubTopic>command/motor_speed</commandSubTopic>
+        <commandSubTopic>command/motor_speed</commandSubTopic>
         <motorSpeedPubTopic>motor_speed/0</motorSpeedPubTopic>
-        <motorConstant>9.9865e-06</motorConstant>         <!-- Keep original physics -->
+        <motorConstant>${motor_constant}</motorConstant>         <!-- Keep original physics -->
         <momentConstant>0.016</momentConstant>             
-        <timeConstantUp>0.0125</timeConstantUp>
-        <timeConstantDown>0.025</timeConstantDown>
+        <timeConstantUp>${time_constant_up}</timeConstantUp>
+        <timeConstantDown>${time_constant_down}</timeConstantDown>
         <maxRotVelocity>838</maxRotVelocity>               <!-- Plugin will scale to this -->
         <motorType>velocity</motorType>
       </plugin>
@@ -151,12 +151,12 @@
         <linkName>right_blade_link</linkName>
         <actuator_number>1</actuator_number>
         <turningDirection>cw</turningDirection>
-        REMOVED: <commandSubTopic>command/motor_speed</commandSubTopic>
+        <commandSubTopic>command/motor_speed</commandSubTopic>
         <motorSpeedPubTopic>motor_speed/1</motorSpeedPubTopic>
-        <motorConstant>9.9865e-06</motorConstant>         
+        <motorConstant>${motor_constant}</motorConstant>         
         <momentConstant>0.016</momentConstant>             
-        <timeConstantUp>0.0125</timeConstantUp>
-        <timeConstantDown>0.025</timeConstantDown>
+        <timeConstantUp>${time_constant_up}</timeConstantUp>
+        <timeConstantDown>${time_constant_down}</timeConstantDown>
         <maxRotVelocity>838</maxRotVelocity>
         <motorType>velocity</motorType>
       </plugin>
@@ -169,12 +169,12 @@
         <linkName>bot_rud_motor_link</linkName>
         <actuator_number>2</actuator_number>
         <turningDirection>cw</turningDirection>
-        REMOVED: <commandSubTopic>command/motor_speed</commandSubTopic>
+        <commandSubTopic>command/motor_speed</commandSubTopic>
         <motorSpeedPubTopic>motor_speed/2</motorSpeedPubTopic>
-        <motorConstant>9.9865e-06</motorConstant>         
+        <motorConstant>${motor_constant}</motorConstant>         
         <momentConstant>0.016</momentConstant>             
-        <timeConstantUp>0.0125</timeConstantUp>
-        <timeConstantDown>0.025</timeConstantDown>
+        <timeConstantUp>${time_constant_up}</timeConstantUp>
+        <timeConstantDown>${time_constant_down}</timeConstantDown>
         <maxRotVelocity>838</maxRotVelocity>
         <motorType>velocity</motorType>
       </plugin>
