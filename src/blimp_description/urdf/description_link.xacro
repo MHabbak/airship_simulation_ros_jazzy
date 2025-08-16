@@ -109,7 +109,7 @@
     <xacro:insert_block name="origin_base_stick_joint" />
           <parent link="base_link" />
           <child link="stick_link" />
-    <axis xyz="0 0 1" />
+    <axis xyz="0 0 -1" />
     <limit effort="${effort_stick}" velocity="${velocity_stick}" lower="${-max_angle_stick}" upper="${max_angle_stick}" /> 
     <dynamics damping="5.0"/>
   </joint>

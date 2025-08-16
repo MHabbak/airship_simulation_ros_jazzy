@@ -198,6 +198,44 @@ def generate_launch_description():
         ]
     )
 
+    # 9. Servo Scaler Bridge + Node (T+10)
+    start_servo_scaler = TimerAction(
+        period=10.0,
+        actions=[
+            LogInfo(msg="Starting servo scaler bridge and node..."),
+            
+            # Bridge 1: Gazebo servo_0 → ROS2
+            Node(
+                package='ros_gz_bridge',
+                executable='parameter_bridge',
+                name='servo_bridge_in',
+                arguments=['/model/blimp/servo_0@std_msgs/msg/Float64@gz.msgs.Double'],
+                parameters=[{'use_sim_time': use_sim_time}],
+                output='screen'
+            ),
+            
+            # Bridge 2: ROS2 servo_0_scaled → Gazebo  
+            Node(
+                package='ros_gz_bridge',
+                executable='parameter_bridge', 
+                name='servo_bridge_out',
+                arguments=['/model/blimp/servo_0_scaled@std_msgs/msg/Float64@gz.msgs.Double'],
+                parameters=[{'use_sim_time': use_sim_time}],
+                output='screen'
+            ),
+            
+            # Servo Scaler Node
+            Node(
+                package='blimp_tilt_scaler',
+                executable='servo_scaler',
+                name='servo_scaler',
+                namespace=namespace,
+                parameters=[{'use_sim_time': use_sim_time}],
+                output='screen'
+            ),
+        ]
+    )
+
     return LaunchDescription([
         # Environment setup
         gazebo_resource_path,
@@ -220,6 +258,7 @@ def generate_launch_description():
         # Timed sequence
         spawn_blimp,           # T+3: Spawn blimp at 0.5m height
         start_px4,             # T+6: Start PX4 with correct config
+        start_servo_scaler,     # T+10: Start servo scaler bridge and node
         # start_ros_monitoring,  # T+9: Start ROS bridges
         # verify_system,         # T+12: Check system status
     ])

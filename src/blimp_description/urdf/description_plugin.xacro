@@ -204,7 +204,7 @@
       <plugin filename="gz-sim-joint-position-controller-system" 
               name="gz::sim::systems::JointPositionController">
         <joint_name>base_stick_joint</joint_name>
-        <sub_topic>servo_0</sub_topic>
+        <sub_topic>servo_0_scaled</sub_topic>  <!-- Scaling by 2 times as PX4 is giving half the angle -->
         <p_gain>100</p_gain>
       </plugin>
     </gazebo>
