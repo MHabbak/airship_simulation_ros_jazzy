@@ -198,7 +198,18 @@
     </gazebo>
   </xacro:if>
 
-   
+  <!-- Tilt Joint Controller -->
+  <xacro:if value="$(arg enable_physics)">
+    <gazebo>
+      <plugin filename="gz-sim-joint-position-controller-system" 
+              name="gz::sim::systems::JointPositionController">
+        <joint_name>base_stick_joint</joint_name>
+        <sub_topic>servo_0</sub_topic>
+        <p_gain>100</p_gain>
+      </plugin>
+    </gazebo>
+  </xacro:if>
+
   <!-- PX4 Integration - REMOVED broken plugin, using native GZ bridge instead -->
   <!-- PX4 automatically connects to sensors when PX4_GZ_MODEL_NAME environment variable is set -->
   <!-- This eliminates the need for the problematic gz-sim-multicopter-velocity-control-system plugin -->
