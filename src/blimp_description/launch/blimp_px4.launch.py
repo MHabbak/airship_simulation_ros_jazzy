@@ -202,36 +202,46 @@ def generate_launch_description():
     start_servo_scaler = TimerAction(
         period=10.0,
         actions=[
-            LogInfo(msg="Starting servo scaler bridge and node..."),
+            LogInfo(msg='Starting servo scaler bridge and node for all servos...'),
             
-            # Bridge 1: Gazebo servo_0 → ROS2
+            # Bridge IN: Gazebo -> ROS2 (all raw servo topics)
             Node(
                 package='ros_gz_bridge',
                 executable='parameter_bridge',
-                name='servo_bridge_in',
-                arguments=['/model/blimp/servo_0@std_msgs/msg/Float64@gz.msgs.Double'],
+                name='servo_bridge_in_all',
+                arguments=[f'/model/{'blimp'}/servo_{i}@std_msgs/msg/Float64@gz.msgs.Double'
+                   for i in range(5)],
                 parameters=[{'use_sim_time': use_sim_time}],
-                output='screen'
+                output='screen',
             ),
             
-            # Bridge 2: ROS2 servo_0_scaled → Gazebo  
+            # Bridge OUT: ROS2 -> Gazebo (all scaled servo topics)
             Node(
                 package='ros_gz_bridge',
-                executable='parameter_bridge', 
-                name='servo_bridge_out',
-                arguments=['/model/blimp/servo_0_scaled@std_msgs/msg/Float64@gz.msgs.Double'],
+                executable='parameter_bridge',
+                name='servo_bridge_out_all',
+                arguments=[f'/model/{'blimp'}/servo_{i}_scaled@std_msgs/msg/Float64@gz.msgs.Double'
+                   for i in range(5)],
                 parameters=[{'use_sim_time': use_sim_time}],
-                output='screen'
+                output='screen',
             ),
             
-            # Servo Scaler Node
+            # Multi-Servo Scaler node: handles different scaling per servo
             Node(
                 package='blimp_tilt_scaler',
                 executable='servo_scaler',
                 name='servo_scaler',
                 namespace=namespace,
-                parameters=[{'use_sim_time': use_sim_time}],
-                output='screen'
+                parameters=[{
+                    'use_sim_time': use_sim_time,
+                    'model_name': 'blimp',
+                    'servo_count': 5,
+                    'tilt_index': 4,              # servo_4 is tilt per your mapping
+                    'px4_input_max_deg': 45.0,             # PX4 command range
+                    'tilt_target_max_deg': 100.0,          # Tilt hardware limit  
+                    'control_surface_target_max_deg': 60.0, # Control surface limit
+                }],
+                output='screen',
             ),
         ]
     )

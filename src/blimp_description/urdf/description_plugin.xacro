@@ -95,6 +95,57 @@
       </plugin>
     </gazebo>
 
+        <!-- Left Elevator Aerodynamics -->
+    <gazebo>
+      <!-- FIXED: Correct plugin name to match registration -->
+      <plugin name="finliftdrag_plugin::FinLiftDragPlugin" filename="finliftdrag_plugin">
+        <robotNamespace>${namespace}</robotNamespace>
+        <link_name>left_elv_part1_link</link_name>
+        <control_joint_name>left_elv_part1_left_elv_joint_link_joint</control_joint_name>
+        <rho>1.2041</rho>
+        <cla>0.6</cla>
+        <cda>1.2</cda>
+        <cma>0.01</cma>
+        <alpha_stall>0.3839</alpha_stall>
+        <cla_stall>0.0</cla_stall>
+        <cda_stall>1.2</cda_stall>
+        <cma_stall>0.0</cma_stall>
+        <alpha_0>0</alpha_0>
+        <area>0.5</area>
+        <radial_symmetry>false</radial_symmetry>
+        <upward>0 0 1</upward>
+        <forward>1 0 0</forward>
+        <cp>0 0 0</cp>
+        <control_joint_rad_to_cl>4.0</control_joint_rad_to_cl>
+        <windSpeedSubTopic>wind_speed</windSpeedSubTopic>
+      </plugin>
+    </gazebo>
+
+    <!-- Right Elevator Aerodynamics -->
+    <gazebo>
+      <!-- FIXED: Correct plugin name to match registration -->
+      <plugin name="finliftdrag_plugin::FinLiftDragPlugin" filename="finliftdrag_plugin">
+        <robotNamespace>${namespace}</robotNamespace>
+        <link_name>right_elv_part1_link</link_name>
+        <control_joint_name>right_elv_part1_right_elv_joint_link_joint</control_joint_name>
+        <rho>1.2041</rho>
+        <cla>0.6</cla>
+        <cda>1.2</cda>
+        <cma>0.01</cma>
+        <alpha_stall>0.3839</alpha_stall>
+        <cla_stall>0.0</cla_stall>
+        <cda_stall>1.2</cda_stall>
+        <cma_stall>0.0</cma_stall>
+        <alpha_0>0</alpha_0>
+        <area>0.5</area>
+        <radial_symmetry>false</radial_symmetry>
+        <upward>0 0 -1</upward>
+        <forward>1 0 0</forward>
+        <cp>0 0 0</cp>
+        <control_joint_rad_to_cl>4.0</control_joint_rad_to_cl>
+        <windSpeedSubTopic>wind_speed</windSpeedSubTopic>
+      </plugin>
+    </gazebo>
   </xacro:if>
 
   <!-- Buoyancy Plugin - Using your migrated dynamicvolume_plugin -->
@@ -204,8 +255,48 @@
       <plugin filename="gz-sim-joint-position-controller-system" 
               name="gz::sim::systems::JointPositionController">
         <joint_name>base_stick_joint</joint_name>
-        <sub_topic>servo_0_scaled</sub_topic>  <!-- Scaling by 2 times as PX4 is giving half the angle -->
+        <sub_topic>servo_4_scaled</sub_topic>  <!-- Scaling as PX4 gives +- 45 degrees -->
         <p_gain>100</p_gain>
+      </plugin>
+    </gazebo>  
+      <!-- Control Surface Joint Position Controllers -->
+      <!-- Left Elevator -->
+    <gazebo>
+      <plugin filename="gz-sim-joint-position-controller-system"
+              name="gz::sim::systems::JointPositionController">
+        <joint_name>left_elv_part1_left_elv_joint_link_joint</joint_name>
+        <sub_topic>servo_0_scaled</sub_topic>
+        <p_gain>60</p_gain>
+      </plugin>
+    </gazebo>
+
+      <!-- Right Elevator -->  
+    <gazebo>
+      <plugin filename="gz-sim-joint-position-controller-system"
+              name="gz::sim::systems::JointPositionController">
+        <joint_name>right_elv_part1_right_elv_joint_link_joint</joint_name>
+        <sub_topic>servo_1_scaled</sub_topic>
+        <p_gain>60</p_gain>
+      </plugin>
+    </gazebo>
+
+      <!-- Top Rudder -->
+    <gazebo>
+      <plugin filename="gz-sim-joint-position-controller-system"
+              name="gz::sim::systems::JointPositionController">
+        <joint_name>top_rud_part1_top_rud_joint_link_joint</joint_name>
+        <sub_topic>servo_2_scaled</sub_topic>
+        <p_gain>60</p_gain>
+      </plugin>
+    </gazebo>
+
+      <!-- Bottom Rudder -->
+    <gazebo>
+      <plugin filename="gz-sim-joint-position-controller-system"
+              name="gz::sim::systems::JointPositionController">
+        <joint_name>bot_rud_part1_bot_rud_joint_link_joint</joint_name>
+        <sub_topic>servo_3_scaled</sub_topic>
+        <p_gain>60</p_gain>
       </plugin>
     </gazebo>
   </xacro:if>
