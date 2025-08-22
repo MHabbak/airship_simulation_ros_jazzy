@@ -236,10 +236,10 @@ def generate_launch_description():
                     'use_sim_time': use_sim_time,
                     'model_name': 'blimp',
                     'servo_count': 5,
-                    'tilt_index': 4,              # servo_4 is tilt per your mapping
-                    'px4_input_max_deg': 45.0,             # PX4 command range
-                    'tilt_target_max_deg': 100.0,          # Tilt hardware limit  
-                    'control_surface_target_max_deg': 60.0, # Control surface limit
+                    'tilt_index': 4,             # servo_4 is tilt
+                    'raw_max_deg': 45.0,         # PX4 command range (±45°)
+                    'tilt_target_deg': 100.0,    # Tilt hardware limit (±100°)
+                    'others_target_deg': 60.0,   # Control surface limit (±60°)
                 }],
                 output='screen',
             ),

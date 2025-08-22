@@ -61,7 +61,7 @@
   <depend>geographic_msgs</depend>
   <depend>mavros_extras</depend>
   <depend>px4_msgs</depend>
-  <depend>px4_ros_com</depend>
+  <!-- <depend>px4_ros_com</depend> -->
   
   <!-- REMOVED: LibrePilot dependencies -->
   <!-- <depend>roshitl</depend> -->

@@ -23,13 +23,6 @@ find_package(nav_msgs REQUIRED)
 find_package(mavros_msgs REQUIRED)
 find_package(geographic_msgs REQUIRED)
 
-# Install Python scripts 
-install(PROGRAMS
-  script/px4_blimp_control.py
-  script/mavros_sensor_bridge.py
-  script/px4_sitl_launcher.py
-  DESTINATION lib/${PROJECT_NAME}
-)
 
 # Install directories
 install(DIRECTORY
