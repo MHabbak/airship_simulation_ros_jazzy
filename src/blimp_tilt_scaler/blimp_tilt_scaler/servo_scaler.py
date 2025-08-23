@@ -62,7 +62,7 @@ class ServoScaler(Node):
             out = Float64()
             out.data = msg.data * gain
             if idx == self.tilt_index:
-                out.data += math.radians(7.0)  # e.g. trim forward when testing in Multicopter mode
+                out.data += math.radians(5.25)  # e.g. trim forward when testing in Multicopter mode
             pub.publish(out)
         return _cb
 
