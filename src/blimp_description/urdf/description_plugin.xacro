@@ -187,12 +187,12 @@
         <commandSubTopic>command/motor_speed</commandSubTopic>
         <motorSpeedPubTopic>motor_speed/0</motorSpeedPubTopic>
         <motorConstant>${motor_constant}</motorConstant>         <!-- Keep original physics -->
-        <momentConstant>0.</momentConstant>             
+        <momentConstant>${moment_constant}</momentConstant>             
         <timeConstantUp>${time_constant_up}</timeConstantUp>
         <timeConstantDown>${time_constant_down}</timeConstantDown>
         <maxRotVelocity>838</maxRotVelocity>               <!-- Plugin will scale to this -->
         <motorType>velocity</motorType>
-        <rotorVelocitySlowdownSim>1</rotorVelocitySlowdownSim>
+        <!-- <rotorVelocitySlowdownSim>100</rotorVelocitySlowdownSim> -->
       </plugin>
 
       <!-- Motor 1: Right Blade -->  
@@ -206,32 +206,31 @@
         <commandSubTopic>command/motor_speed</commandSubTopic>
         <motorSpeedPubTopic>motor_speed/1</motorSpeedPubTopic>
         <motorConstant>${motor_constant}</motorConstant>         
-        <momentConstant>0</momentConstant>             
+        <momentConstant>${moment_constant}</momentConstant>             
         <timeConstantUp>${time_constant_up}</timeConstantUp>
         <timeConstantDown>${time_constant_down}</timeConstantDown>
         <maxRotVelocity>838</maxRotVelocity>
         <motorType>velocity</motorType>
-        <rotorVelocitySlowdownSim>1</rotorVelocitySlowdownSim>
+        <!-- <rotorVelocitySlowdownSim>100</rotorVelocitySlowdownSim> -->
       </plugin>
 
-      <!-- Motor 2: Bottom Rudder -->
-      <plugin filename="gz-sim-multicopter-motor-model-system" 
-              name="gz::sim::systems::MulticopterMotorModel">
-        <robotNamespace>${namespace}</robotNamespace>
-        <jointName>bot_rud_part1_bot_rud_motor_joint</jointName>
-        <linkName>bot_rud_motor_link</linkName>
-        <actuator_number>2</actuator_number>
-        <turningDirection>cw</turningDirection>
-        <commandSubTopic>command/motor_speed</commandSubTopic>
-        <motorSpeedPubTopic>motor_speed/2</motorSpeedPubTopic>
-        <motorConstant>${motor_constant}</motorConstant>         
-        <momentConstant>0</momentConstant>             
-        <timeConstantUp>${time_constant_up}</timeConstantUp>
-        <timeConstantDown>${time_constant_down}</timeConstantDown>
-        <maxRotVelocity>838</maxRotVelocity>
-        <motorType>velocity</motorType>
-        <rotorVelocitySlowdownSim>1</rotorVelocitySlowdownSim>
+      <!-- Motor 2: bidirectional tail thruster (signed force) -->
+      <plugin filename="gz-sim-thruster-system"
+              name="gz::sim::systems::Thruster">
+        <!-- Use the same namespace and joint as before -->
+        <namespace>${namespace}</namespace>
+        <joint_name>bot_rud_part1_bot_rud_motor_joint</joint_name>
+        <min_thrust_cmd>-1000</min_thrust_cmd>
+        <max_thrust_cmd>1000</max_thrust_cmd>
+        <!-- <deadband>0.1</deadband> -->
+
+        <!-- Apply force directly (not velocity control) -->
+        <velocity_control>false</velocity_control>
+
+        <propeller_diameter>0.08</propeller_diameter>
+        <thrust_coefficient>1.0</thrust_coefficient>
       </plugin>
+
     </gazebo>
   </xacro:if>
 

@@ -460,8 +460,7 @@
     <xacro:insert_block name="origin_left_elv_part1_left_elv_joint_link_joint" />
           <parent link="left_elv_part1_link" />
           <child link="left_elv_joint_link" />
-    <!-- FIXED: Correct axis from original ROS1 (was 0 0 -1) -->
-    <axis xyz="0 0 1" />
+    <axis xyz="0 0 -1" />
     <limit effort="${effort_fin}" velocity="${velocity_fin}" lower="${-max_angle_fin}" upper="${max_angle_fin}" /> 
   </joint>
 
